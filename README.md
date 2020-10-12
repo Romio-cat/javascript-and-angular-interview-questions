@@ -17,7 +17,7 @@ JavaScript and Angular Interview Questions &amp; Answers
 | 8| [ООП](#ООП) |
 | 9| [SOLID](#SOLID) |
 
-##Основы
+## Основы
 
 1. ### Чистота функции
    1. Чистая функция
