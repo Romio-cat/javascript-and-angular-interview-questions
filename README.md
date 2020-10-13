@@ -22,11 +22,11 @@ JavaScript and Angular Interview Questions &amp; Answers
 | 3| [Lexical environment](#Lexical-environment) |
 | 4| [Замыкание](#Замыкание) |
 | 5| [Hoisting](#Hoisting) |
-| 6| [Разница между function expression и function declaration](#Разница-между-function expression-и-function declaration) |
+| 6| [Разница между function expression и function declaration](#Разница-между-function-expression-и-function-declaration) |
 | 7| [Способы создать объект](#Способы-создать-объект) |
 | 8| [this](#this) |
 | 9| [Что такое цепочка прототипов](#Что-такое-цепочка-прототипов) |
-| 10| [Разница между for in и for of](#Разница-между-for in-и-for of) |
+| 10| [Разница между for in и for of](#Разница-между-for-in-и-for-of) |
 | 11| [Разница между методами массива slice и splice](#Разница-между-методами-массива-slice-и-splice) |
 | 12| [Разница между == и ===](#Разница-между-==-и-===) |
 | 13| [Что такое функция высшего порядка](#Что-такое-функция-высшего-порядка) |
