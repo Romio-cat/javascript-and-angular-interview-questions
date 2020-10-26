@@ -988,7 +988,7 @@ let tupleExample: [number, string, boolean] = [42, "tuple", true];
 ```
 
 - `Enum` (Перечисление)
-Перечисление позволяет определять именованые константы. Можно создавать текстовые и числовые, смешанные. 
+Перечисление позволяет определять именованые константы. Можно создавать текстовые и числовые, смешанные.
 
 ```typescript
 enum Direction {
@@ -1235,6 +1235,7 @@ const client: Admin<Client> = {
 строку и вернёт, а если примет число, то число и вернёт. При использовании же generics - да.
 
 Ссылка на понятную статью: https://blog.logrocket.com/getting-started-with-typescript-generics/
+
 7. ### Как сделать так, чтобы классы, объявленные в модуле, были бы доступны и за пределами этого модуля?
 При помощи ключевого слова `export`.
 
@@ -1351,6 +1352,7 @@ type Employee = {//Dublicate identifier 'Employee'
 const employee: Employee = { age: 23 };//Type '{age: number}' is not assignable to type 'Employee'
 ```
 Ссылка: https://teletype.in/@alteregor/rkPlgmQz8
+
 11. ### Для чего нужен тип «Omit»?
 Тип `Omit` нужен для того, чтобы указать свойства, которые должны быть исключены из исходного типа.
 
