@@ -908,20 +908,672 @@ console.log(koala.__proto__ === Animal.prototype);//true
 ## TypeScript
 
 1. ### Суть TypeScript в разработке
-2. ### Какие есть типы данных
+- Предотвращает появление множества багов. Следующий пример это хорошо демонстрирует:
+
+```javascript
+function getHumanReadableMessage(response) {
+  if (response.data.hasSucceded) {
+    return `Your action succeded because: ${response.message}`;
+  }
+  return `Something went wrong:(`
+}
+
+const apiResponse = {
+  data: {
+    hasSucceded: true,
+    message: `Suceessful log in.`,
+  },
+};
+
+console.log(getHumanReadableResponse(apiResponse));//Your action succeded because: undefined
+```
+То есть, в приведённом выше примере не будет даже ошибки при выполнении, потому что в JS мы можем обращаться к
+несуществующим свойствам объекта. Но это ведь не то, что нужно.
+
+А вот если использовать TS:
+```typescript
+interface ApiResponse {
+  data: {
+    hasSucceded: boolean;
+    message: string;
+  };
+}
+
+function getHumanReadableResponse(response: ApiResponse) {
+  if (response.data.hasSucceded) {
+    return `Your action succeded because: ${response.message}`;//ещё до компиляции получим ошибку, что свойство 'message' dosn't exist in type ApiResponse
+  }
+  return `Something went wrong:(`
+}
+
+const apiResponse = {
+  data: {
+    hasSucceded: true,
+    message: `Suceessful log in.`,
+  },
+}
+
+getHumanReadableResponse(apiResponse);
+```
+- Очевидно, что в связи с предыдущим пунктом значительно сокращается время разработки, так как не тратится время на выявление таких ошибок
+- Строгая типизация избавляет от ручной проверки, например, типов аргументов в функции.
+- Лучшая читаемость, поддерживаемость.
+
+2. ### Какие есть типы данных  
+
+В TS существуют следующие базовые типы данных (для тех, которые соотносятся с типами в JS, примеры не приводятся):
+- `Boolean`
+- `Number`
+- `BigInt`
+- `String`
+- `Array`
+Создать массив можно так:
+
+```typescript
+let list: number[] = [1, 2, 3, 4, 5];
+```
+А можно так (используя т.н *дженерик-тип*):
+
+```typescript
+let list: Array<number> = [1, 2, 3, 4, 5];
+```
+
+- `Tuple` (Кортежи)
+Похожи на массивы, но имеют важную особенность: указывают на тип каждого элемента.
+Очевидно, что кроме типов в создаваемом кортеже должно совпадать также количество
+позиций.
+
+```typescript
+let tupleExample: [number, string, boolean] = [42, "tuple", true];
+```
+
+- `Enum` (Перечисление)
+Перечисление позволяет определять именованые константы. Можно создавать текстовые и числовые.
+Числовые:
+
+```typescript
+enum Direction {
+  Up,
+  Down,
+  Left,
+  Right
+};
+```
+В числовых перечислениях значение первого элемента о умолчанию 0, Но это можно менять.
+Можно устанавливаь свои примеры.
+
+Текстовые:
+
+```typescript
+enum Direction {
+  Up = "UP",
+  Down = "DOWN",
+  Left = "LEFT",
+  Right = "RIGHT"
+};
+```
+
+- `Unknown`
+Тип используется, когда переменной может быть присвоено значение любого типа. Однако, хотя
+всё что угодно может быть присвоено `unknown`, но `unknown` не может быть присвоен ничему:
+
+```typescript
+let varUnknown: unknown = 20;
+
+let str: string = varUnknown;//Type 'unknown' is not assignable to type 'string'
+```
+
+- `Any`
+Тип, похожий на `unknown`, но имеет отличие: переменную с таким типом можно присваивать другим типам.
+Можно даже попытаться прочитать свойство, которое даже не существует (такого с `unknown` не сделаешь):
+
+```typescript
+let varAny: any = 20;
+let str: string = varAny;//ошибки не будет, всё ок.
+
+varAny.method();//по-прежнему никакой ошибки
+```
+
+- `Void`
+Буквально означает отсутсвие какого-либо типа. Используется в функциях, которые не возвращают
+никакого значения:
+
+```typescript
+function warnUser(): void {
+  console.log("This is my warning message");
+}
+```
+
+- `Null` и `Undefined`
+Принимают соответствующие значения null и undefined. Но фактически мы можем присваивать значения
+`null` и `undefined` переменным других типов.
+- `Never`
+Представляет отсутствие значения и используется в качестве возвращаемого типа функций, которые генерируют или возвращают ошибку.
+- `Object`
+
 3. ### Что такое Interface и во что он компилируется
+***Интерфейс (Interface)*** можно определить как некоторую договорённость, контракт, которому должны следовать сущности в коде.
+Этот "контракт" устанавливает, ***что*** должно быть сделано, но не ***как***. При этом хоть и обязательно, чтобы сущности следовали установленным
+договорённостям, однако они могут добавлять и свои.
+Интерфейсы можно использовать, чтобы определить структуру функций:
+```typescript
+interface Order {
+  (customerId: number, modelId: number): boolean
+}
+
+let orderFn: Order = function (customerId, modelId) {
+  //действия для обработки заказа
+  return true
+}
+```
+Также интерфейсы очень полезны, чтобы определить, что же должно присутствовать в том или ином классе:
+```typescript
+interface Car {
+  width: number;
+  length: number;
+  wheelbase: number;
+  seatingCapacity: number;
+  getTyrePressure?: () => number;
+  getRemCharging: () => number;
+}
+
+class CarModelPrototype implements Car {
+  length: number;
+  width: number;
+  wheelbase: number;
+  seatingCapacity: number;
+  doorsRealisation: string;
+
+  constructor(l: number, w: number, wb: number, sc: number) {
+    this.length = l;
+    this.width = w;
+    this.wheelbase = wb;
+    this.seatingCapacity = sc;
+  }
+
+  getTyrePressure() {
+    let tyrePressure = 20;
+    return tyrePressure
+  }
+
+  getRemCharging() {
+    let remCharging = 20
+    return remCharging
+  }
+}
+```
+Ссылка на статью, где приводятся аналогии с реальной жизнью: https://blog.logrocket.com/interfaces-in-typescript-what-are-they-and-how-do-we-use-them-befbc69b38b3/
 4. ### Что такое Enum и во что он компилируется
+***`enum` (перечисление)*** - это тип данных в TS, который позволяет определять набор именованых числовых констант. перечисление
+состоит из нуля или более элементов, каждый из которых имеет ассоциированное с ним значение. Перечисления бывают числовыми (numeric enums),
+строчными (string-based enums), смешанными (heterogeneous enums).
+
+Примеры числового:
+
+```typescript
+enum NoYes {
+  No,
+  Yes,
+};
+
+enum NoYes {
+  No = 0,
+  Yes = 1,
+};
+```
+К слову, перечисление с примера выше компилируется в следующее:
+```javascript
+"use strict";
+var NoYes;
+(function (NoYes) {
+    NoYes[NoYes["No"] = 0] = "No";
+    NoYes[NoYes["Yes"] = 1] = "Yes";
+})(NoYes || (NoYes = {}));
+```
+Пример строчного:
+```typescript
+enum PrintMedia {
+    Newspaper = "NEWSPAPER",
+    Newsletter = "NEWSLETTER",
+    Magazine = "MAGAZINE",
+    Book = "BOOK",
+};
+```
+Пример смешанного:
+```typescript
+enum Status {
+  Active = "Active",
+  Deactivate = 1,
+  Pending
+};
+```
 5. ### Что такое геттеры и сеттеры в TypeScript?
+***Геттеры и сеттеры*** - это методы класса (с ключевыми словами `get` и `set`), которые позволяют перехватить доступ к свойствам объектов. Они позволяют
+более тщательно контролировать доступ к свойствам объекта.
+```typescript
+class WashingMachine {
+  _amountOfPowderInMl: number;
+  readonly name: string;
+  constructor(name: string) {
+    this.name = name;
+  }
+  get amountOfPowderInMl(): number {
+    return this._amountOfPowderInMl;
+  }
+  set amountOfPowderInMl(newAmount: number) {
+    if (newAmount > 250) {
+      console.log("Too much powder!")
+    } else {
+      this._amountOfPowderInMl = newAmount
+    }
+  }
+}
+
+let washingMachine = new WashingMachine("Machine1000");
+
+washingMachine.amountOfPowderInMl = 300;//Too much powder!
+console.log(washingMachine.amountOfPowderInMl);//undefined, свойство не назначилось, так как не прошло проверку.
+washingMachine.amountOfPowderInMl = 200;
+console.log(washingMachine.amountOfPowderInMl);//200
+```
 6. ### Generics (Обощенные типы)
+***Generics (обобщенные типы, "дженерики")*** - это возможность создавать компоненты, работающие не только с одним,
+а с несколькими типами данных. С помощью дженериков можно создавать обобщённые функции, классы и интерфейсы.
+Пример с обобщённой функцией:
+```typescript
+function print<T>(arg: T): T {
+  return arg;
+}
+
+print("str");//str
+print(42);//42
+```
+Например, в классе:
+```typescript
+class User<T, U> {
+  name: T;
+  age: U;
+  constructor(name: T, age: U) {
+    this.name = name;
+    this.age = age;
+  }
+
+  print(): void {
+    console.log(`Hello ${this.name}, you are ${this.age} years old!`);
+  }
+};
+
+const newUser1 = new User("Leonardo", 23);
+newUser1.print(); // Hello Leonardo, you are 23 years old!
+
+const newUser2 = new User("Leonardo", "23");//без generics так нельзя было бы сделать.
+newUser2.print();//Hello Leonardo, you are 23 years old!
+```
+Пример с интерфейсом:
+```typescript
+interface User {
+  firstName: string;
+};
+
+interface Client {
+  firstName: string;
+  lastName: string;
+};
+
+interface Admin<T> {
+  values: T;
+  isAdmin: true;
+};
+
+const user: Admin<User> = {
+  values: {
+    firstName: "Leonardo"
+  },
+  isAdmin: true
+};
+
+const client: Admin<Client> = {
+  values: {
+    firstName: "Leonardo",
+    lastName: "Maldonado"
+  },
+  isAdmin: true
+};
+```
+Отличие **generics** от использования `any` в примерах выше в том, что не теряется проверка типов, просто типы можно использовать любые.
+При использовании `any`, например, в функции, мы не можем быть уверены в том, что, приняв в качестве аргумента строку, функция
+строку и вернёт, а если примет число, то число и вернёт. При использовании же generics - да.
+
+Ссылка на понятную статью: https://blog.logrocket.com/getting-started-with-typescript-generics/
 7. ### Как сделать так, чтобы классы, объявленные в модуле, были бы доступны и за пределами этого модуля?
+При помощи ключевого слова `export`.
+
+```typescript
+module Vehicle {
+    export class Car {
+        constructor (
+            public make: string,
+            public model: string) { }
+    }
+    var audiCar = new Car("Audi", "Q7");
+}
+
+let fordCar = Vehicle.Car("Ford", "Figo");
+```
 8. ### Поддерживает ли TypeScript перегрузку функций?
+
+Да, TS поддерживает возможность перегрузки функций. "Перегрузить функцию" означает определить несколько
+"версий" функции, которые будут иметь одно и то же имя, но разные типы параметров или разное количество параметров
+```typescript
+function add(x: string, y: string): string;
+function add(x: number, y: number): number;
+function add(x: any, y: any): any {
+    return x + y;
+}
+
+let result1 = add(5, 4);
+console.log(result1);// 9
+let result2 = add("5", "4");
+console.log(result2);// 54
+
+//а вот так не сработает и выдаст ошибку:
+let result3 = add(true, false);
+console.log(result3);//no overload match this call
+```
 9. ### Как в TypeScript перегрузить конструктор класса?
+- При помощи необязательного параметра:
+
+```typescript
+class Box {
+    public x: number;
+    public y: number;
+    public height: number;
+    public width: number;
+
+    constructor();
+    constructor(obj: IBox);
+    constructor(obj?: any) {    
+        this.x = obj && obj.x || 0
+        this.y = obj && obj.y || 0
+        this.height = obj && obj.height || 0
+        this.width = obj && obj.width || 0;
+    }   
+}
+```
+- При помощи типа-объединения:
+
+```typescript
+class foo {
+    private _name: any;
+    constructor(name: string | number) {
+        this._name = name;
+    }
+}
+let f1 = new foo("bar");
+let f2 = new foo(1);
+```
 10. ### Разница между interface и type в TypeScript?
+
+Разница между `interface` и `type` в том, что:  
+- Интерфейсы позволяют выразить пересечение типов, однако не позволяют выразить объединение.
+Пример ограничения на типах, которое невозможно на интерфейсах:
+
+```typescript
+type Wish =
+  | { fast: true, quality: true, cheap: false } // Дорого
+  | { fast: true, quality: false, cheap: true } // Некачественно
+  | { fast: false, quality: true, cheap: true } // Медленно
+
+const wish: Wish = { fast: true, quality: true, cheap: true } // Не компилируется
+```
+- Интерфейсы нельзя комбинировать с mapped типами (Partial, Required, Pick):
+
+```typescript
+// С типом работает
+type RealProfile = Pick<TwitterProfile, 'drinkCoffee'>;
+
+// С интерфейсом не работает
+interface RealProfile extends Pick<TwitterProfile, 'drinkCoffee'> {};
+```
+- Интерфейсы поддерживают declaration merging - то есть слияние интерфейсов с одинаковыми именами:
+
+```typescript
+interface Employee {
+  salary: number;
+}
+
+interface Employee {
+  age: number;
+}
+
+const employee: Employee = { age: 23 };//Property 'salary' is missing in type '{age: number}', but required in type Employee
+```
+С `type` такого не происходит:
+```typescript
+type Employee = {//Dublicate identifier 'Employee'
+  salary: number;
+}
+
+type Employee = {//Dublicate identifier 'Employee'
+  age: number;
+}
+
+const employee: Employee = { age: 23 };//Type '{age: number}' is not assignable to type 'Employee'
+```
+Ссылка: https://teletype.in/@alteregor/rkPlgmQz8
 11. ### Для чего нужен тип «Omit»?
+Тип `Omit` нужен для того, чтобы указать свойства, которые должны быть исключены из исходного типа.
+
+```typescript
+type InhabitedPlanet = {name: string, age: number, population: number};
+type UninhabitedPlanet = Omit<InhabitedPlanet, "population">;
+
+let mercury: UninhabitedPlanet = {
+  name: "Mercury",
+  age: 4503e9
+};
+```
 12. ### Для чего нужен тип «Record»?
+
+Тип `Record<Keys, Type>` создаёт тип cо свойствами `Keys` типа `Type`.
+
+Например, следующую запись типа
+```typescript
+type PropResponse = {
+  prop1: string
+  prop2: string
+  prop3: string
+};
+```
+можно записать короче, используя `Record<Keys, Type`:
+```typescript
+type PropResponse = Record<'prop1' | 'prop2' | 'prop3', string>;
+```
 13. ### Когда используется ключевое слово «unknown»?
+
+Когда заранее неизвестно, значение какого типа будет присвоено переменной. Потом тип можно проверить:
+
+```typescript
+let person: unknown = 'John';
+
+if (typeof person === string) {
+  let name: string = person;
+}
+```
 14. ### Разница между абстрактным классом и интерфейсом typescript
+- В интерфейсе все свойства являются по-умолчанию абстрактными, а в абстрактном классе некоторые абстрактные,
+а некоторые могут быть полностью реализоваными (этим можно управлять).
+
+Пример с интерфейсом:
+
+```typescript
+interface Person {
+  name: string;
+
+  display(name: string): void;//можно обозначить только, что этот метод должен присутствовать, но нельзя указать как именно он должен быть реализован.
+}
+
+class Employee implements Person {//class 'Employee' incorrectly implements interface 'Person'. Property 'display' is missing in type 'Employee' but required in type 'Person'
+  name: string;
+}
+```
+Пример с абстрактным классом:
+```typescript
+abstract class Person {
+  abstract name: string;
+
+  display(): void {
+    console.log(this.name)//нужно указать реализацию метода
+  }
+}
+
+class Employee extends Person {//никакой ошибки не будет, метод display необязательный
+  name: string;
+}
+```
+- Интерфейсы поддерживают множественно наследование, а абстрактные классы нет.
+Множественное наследование - это наследование от более чем одного родителя.
+
+Пример с интерфейсом:
+
+```typescript
+interface IPerson {
+    name: string;
+}
+
+interface IHuman {
+  gender: string;
+}
+
+interface IAdult extends IPerson {
+    empCode: number;
+}
+
+interface IAdult extends IHuman {
+    hairColor: string
+}
+
+let empObj:IEmployee = {//всё ок, никакой ошибки
+    empCode:1,
+    name:"Bill",
+    gender:"Male",
+    hairColor: "dark"
+}
+```
+Пример с абстрактным классом:
+```typescript
+abstract class Person {
+    name: string;
+}
+
+abstract class Human {
+  gender: string;
+}
+
+abstract class Adult extends Person {//Dublicate identifier 'Adult'
+  name: string;
+  empCode: number;
+}
+
+abstract class Adult extends Human {//Dublicate identifier 'Adult'
+  hairColor: string;
+  gender: string;
+}
+```
+- Интерфейс сам по себе ни во что не компилируется, абстрактный класс же компилируется в JS.
 15. ### Когда нужно использовать ключевое слово «declare»?
+Ключевое свойство "declare" нужно использовать при использовании библиотеки JS, не объявленной в TS-проекте:
+
+```typescript
+declare const libraryName;
+```
 16. ### Как сделать все свойства интерфейса необязательными?
+- При помощи `?` в конце названия свойства (например, `title?: `, `description?: `).
+
+Например:
+```typescript
+interface Todo {
+  title?: string;
+  description?: string;
+}
+
+function updateTodo(todo: Todo, fieldsToUpdate: Todo) {
+  return { ...todo, ...fieldsToUpdate };
+}
+
+const todo1 = {
+  title: "organize desk",
+  description: "clear clutter",
+};
+
+//следующее не вызовет ошибки, потому что свойства необязательные:
+const todo2 = updateTodo(todo1, {})
+```
+
+- При помощи `Partial<Type>`:
+
+```typescript
+interface Todo {
+  title: string;
+  description: string;
+}
+
+function updateTodo(todo: Todo, fieldsToUpdate: Partial<Todo>) {
+  return { ...todo, ...fieldsToUpdate };
+}
+
+const todo1 = {
+  title: "organize desk",
+  description: "clear clutter",
+};
+
+const todo2 = updateTodo(todo1, {})//ошибки никакой не будет, потому что все поля интерфейса необязательные
+```
 17. ### Использовании декораторов свойств в TypeScript
+Декоратор свойства позволяет добавить ему дополнительное свойство:
+
+```typescript
+function format(target: Object, propertyKey: string) {
+  let _val = this[propertyKey];// получаем значение свойства
+
+  // геттер
+  let getter = function() {
+    return 'Mr./Ms.' + _val;
+  };
+
+  // сеттер
+  let setter = function(newVal) {
+    _val = newVal;
+  };
+
+  // удаляем свойство
+  if (delete this[propertyKey]) {
+    // И создаем новое свойство с геттером и сеттером
+    Object.defineProperty(target, propertyKey, {
+      get: getter,
+      set: setter,
+    })
+  }
+}
+
+class User {
+  @format
+  name: string;
+  constructor(name: string) {
+    this.name = name;
+  }
+  print(): void {
+    console.log(this.name);
+  }
+}
+let tom = new User('Tom');
+tom.print();//Mr./Mr.Tom
+tom.name = 'Tommy';
+tom.print();//Mr./Mr.Tommy
+
+```
+
 18. ### Что такое «.map» файл, как и зачем его использовать?
+
+Файл ".map" - это файл карты исходников, который можно использовать при выполнении
+отладки. Его можно сгенерировать, установив опцию компилятора sourseMap в true в файле tsconfig.json
