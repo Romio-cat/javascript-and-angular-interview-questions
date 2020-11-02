@@ -915,7 +915,8 @@ function getHumanReadableMessage(response) {
   if (response.data.hasSucceded) {
     return `Your action succeded because: ${response.message}`;
   }
-  return `Something went wrong:(`
+
+  return `Something went wrong:(`;
 }
 
 const apiResponse = {
@@ -943,7 +944,8 @@ function getHumanReadableResponse(response: ApiResponse) {
   if (response.data.hasSucceded) {
     return `Your action succeded because: ${response.message}`;//ещё до компиляции получим ошибку, что свойство 'message' dosn't exist in type ApiResponse
   }
-  return `Something went wrong:(`
+
+  return `Something went wrong:(`;
 }
 
 const apiResponse = {
@@ -967,6 +969,7 @@ getHumanReadableResponse(apiResponse);
 - `BigInt`
 - `String`
 - `Array`
+
 Создать массив можно так:
 
 ```typescript
@@ -979,6 +982,7 @@ let list: Array<number> = [1, 2, 3, 4, 5];
 ```
 
 - `Tuple` (Кортежи)
+
 Похожи на массивы, но имеют важную особенность: указывают на тип каждого элемента.
 Очевидно, что кроме типов в создаваемом кортеже должно совпадать также количество
 позиций.
@@ -988,6 +992,7 @@ let tupleExample: [number, string, boolean] = [42, "tuple", true];
 ```
 
 - `Enum` (Перечисление)
+
 Перечисление позволяет определять именованые константы. Можно создавать текстовые и числовые, смешанные.
 
 ```typescript
@@ -1002,6 +1007,7 @@ enum Direction {
 [Подробнее в ответе на вопрос 4](#Что-такое-Enum-и-во-что-он-компилируется).
 
 - `Unknown`
+
 Тип используется, когда переменной может быть присвоено значение любого типа. Однако, хотя
 всё что угодно может быть присвоено `unknown`, но `unknown` не может быть присвоен ничему:
 
@@ -1012,6 +1018,7 @@ let str: string = varUnknown;//Type 'unknown' is not assignable to type 'string'
 ```
 
 - `Any`
+
 Тип, похожий на `unknown`, но имеет отличие: переменную с таким типом можно присваивать другим типам.
 Можно даже попытаться прочитать свойство, которое даже не существует (такого с `unknown` не сделаешь):
 
@@ -1023,13 +1030,18 @@ varAny.method();//по-прежнему никакой ошибки
 ```
 
 - `Void`
-Буквально означает отсутсвие какого-либо типа. Используется в функциях, которые не возвращают
-никакого значения:
+
+Буквально означает отсутсвие какого-либо типа. В основном используется в функциях, которые не возвращают никакого значения:
 
 ```typescript
 function warnUser(): void {
   console.log("This is my warning message");
 }
+```
+Также используется как тип переменной со значением `undefined`:
+
+```typescript
+const x: void = undefined;
 ```
 
 - `Null` и `Undefined`
@@ -1040,7 +1052,7 @@ function warnUser(): void {
 - `Object`
 
 3. ### Что такое Interface и во что он компилируется
-***Интерфейс (Interface)*** можно определить как некоторую договорённость, контракт, которому должны следовать сущности в коде.
+***Interface (Интерфейс)*** можно определить как некоторую договорённость, контракт, которому должны следовать сущности в коде.
 Этот "контракт" устанавливает, ***что*** должно быть сделано, но не ***как***. При этом хоть и обязательно, чтобы сущности следовали установленным
 договорённостям, однако они могут добавлять и свои.
 Интерфейсы можно использовать, чтобы определить структуру функций:
@@ -1055,6 +1067,7 @@ let orderFn: Order = function (customerId, modelId) {
 }
 ```
 Также интерфейсы очень полезны, чтобы определить, что же должно присутствовать в том или ином классе:
+
 ```typescript
 interface Car {
   width: number;
@@ -1072,29 +1085,28 @@ class CarModelPrototype implements Car {
   seatingCapacity: number;
   doorsRealisation: string;
 
-  constructor(l: number, w: number, wb: number, sc: number) {
-    this.length = l;
-    this.width = w;
-    this.wheelbase = wb;
-    this.seatingCapacity = sc;
+  constructor(length: number, width: number, wheelbase: number, seatingCapacity: number) {
+    this.length = length;
+    this.width = width;
+    this.wheelbase = wheelbase;
+    this.seatingCapacity = seatingCapacity;
   }
 
-  getTyrePressure() {
-    let tyrePressure = 20;
-    return tyrePressure
+  getTyrePressure(): number {
+    return 20;//получено путём долгих вычислений
   }
 
-  getRemCharging() {
-    let remCharging = 20
-    return remCharging
+  getRemCharging(): number {
+    return 20;//получено путём долгих вычислений
   }
 }
 ```
+Сам по себе интерфейс ни во что не компилируется.
 Ссылка на статью, где приводятся аналогии с реальной жизнью: https://blog.logrocket.com/interfaces-in-typescript-what-are-they-and-how-do-we-use-them-befbc69b38b3/
 
 4. ### Что такое Enum и во что он компилируется
 
-***`enum` (перечисление)*** - это тип данных в TS, который позволяет определять набор именованых числовых констант. перечисление
+***Enum (Перечисление)*** - это тип данных в TS, который позволяет определять набор именованых числовых констант. перечисление
 состоит из нуля или более элементов, каждый из которых имеет ассоциированное с ним значение. Перечисления бывают числовыми (numeric enums),
 строчными (string-based enums), смешанными (heterogeneous enums).
 
@@ -1112,6 +1124,7 @@ enum NoYes {
 };
 ```
 К слову, перечисление с примера выше компилируется в следующее:
+
 ```javascript
 "use strict";
 var NoYes;
@@ -1120,7 +1133,33 @@ var NoYes;
     NoYes[NoYes["Yes"] = 1] = "Yes";
 })(NoYes || (NoYes = {}));
 ```
+или же:
+
+```typescript
+var NoYes = {
+  0: "No",
+  1: "Yes",
+  "No": 0,
+  "Yes": 1,
+}
+```
+Также, если мы присвоим какой-то из констант присвоить число, то следующей константе будет присвоено значение на один больше и т.д.
+
+```typescript
+enum AcceptedNumber {
+  First = 5,
+  Second,
+  Third,
+};
+
+let secondNumber: AcceptedNumber = AcceptedNumber.Second;
+let thirdNumber: AcceptedNumber = AcceptedNumber.Third;
+
+console.log(secondNumber);//6
+console.log(thirdNumber);//7
+```
 Пример строчного:
+
 ```typescript
 enum PrintMedia {
     Newspaper = "NEWSPAPER",
@@ -1142,21 +1181,25 @@ enum Status {
 более тщательно контролировать доступ к свойствам объекта.
 ```typescript
 class WashingMachine {
-  _amountOfPowderInMl: number;
+  private amountOfPowderInMl: number;
   readonly name: string;
+
   constructor(name: string) {
     this.name = name;
   }
+
   get amountOfPowderInMl(): number {
-    return this._amountOfPowderInMl;
+    return this.amountOfPowderInMl;
   }
+
   set amountOfPowderInMl(newAmount: number) {
     if (newAmount > 250) {
-      console.log("Too much powder!")
+      console.log("Too much powder!");
     } else {
-      this._amountOfPowderInMl = newAmount
+      this.amountOfPowderInMl = newAmount;
     }
   }
+
 }
 
 let washingMachine = new WashingMachine("Machine1000");
@@ -1167,9 +1210,10 @@ washingMachine.amountOfPowderInMl = 200;
 console.log(washingMachine.amountOfPowderInMl);//200
 ```
 6. ### Generics (Обощенные типы)
-***Generics (обобщенные типы, "дженерики")*** - это возможность создавать компоненты, работающие не только с одним,
+***Generics (обобщенные типы, "дженерики")*** - это возможность создавать компоненты (функции, классы, интерфейсы), работающие не только с одним,
 а с несколькими типами данных. С помощью дженериков можно создавать обобщённые функции, классы и интерфейсы.
 Пример с обобщённой функцией:
+
 ```typescript
 function print<T>(arg: T): T {
   return arg;
@@ -1179,10 +1223,12 @@ print("str");//str
 print(42);//42
 ```
 Например, в классе:
+
 ```typescript
 class User<T, U> {
   name: T;
   age: U;
+
   constructor(name: T, age: U) {
     this.name = name;
     this.age = age;
@@ -1200,6 +1246,7 @@ const newUser2 = new User("Leonardo", "23");//без generics так нельз�
 newUser2.print();//Hello Leonardo, you are 23 years old!
 ```
 Пример с интерфейсом:
+
 ```typescript
 interface User {
   firstName: string;
@@ -1242,19 +1289,19 @@ const client: Admin<Client> = {
 ```typescript
 module Vehicle {
     export class Car {
-        constructor (
-            public make: string,
-            public model: string) { }
+        constructor (public make: string, public model: string) { }
     }
-    var audiCar = new Car("Audi", "Q7");
+
+    let audiCar = new Car("Audi", "Q7");
 }
 
-let fordCar = Vehicle.Car("Ford", "Figo");
+let fordCar = new Vehicle.Car("Ford", "Figo");
 ```
 8. ### Поддерживает ли TypeScript перегрузку функций?
 
 Да, TS поддерживает возможность перегрузки функций. "Перегрузить функцию" означает определить несколько
 "версий" функции, которые будут иметь одно и то же имя, но разные типы параметров или разное количество параметров
+
 ```typescript
 function add(x: string, y: string): string;
 function add(x: number, y: number): number;
@@ -1264,6 +1311,7 @@ function add(x: any, y: any): any {
 
 let result1 = add(5, 4);
 console.log(result1);// 9
+
 let result2 = add("5", "4");
 console.log(result2);// 54
 
@@ -1284,10 +1332,10 @@ class Box {
     constructor();
     constructor(obj: IBox);
     constructor(obj?: any) {    
-        this.x = obj && obj.x || 0
-        this.y = obj && obj.y || 0
-        this.height = obj && obj.height || 0
-        this.width = obj && obj.width || 0;
+        this.x = obj?.x|| 0;
+        this.y = obj?.y || 0;
+        this.height = obj?.height || 0;
+        this.width = obj?.width || 0;
     }   
 }
 ```
@@ -1296,6 +1344,7 @@ class Box {
 ```typescript
 class foo {
     private _name: any;
+
     constructor(name: string | number) {
         this._name = name;
     }
@@ -1362,7 +1411,7 @@ type UninhabitedPlanet = Omit<InhabitedPlanet, "population">;
 
 let mercury: UninhabitedPlanet = {
   name: "Mercury",
-  age: 4503e9
+  age: 4503e9,
 };
 ```
 12. ### Для чего нужен тип «Record»?
@@ -1401,7 +1450,6 @@ if (typeof person === string) {
 ```typescript
 interface Person {
   name: string;
-
   display(name: string): void;//можно обозначить только, что этот метод должен присутствовать, но нельзя указать как именно он должен быть реализован.
 }
 
@@ -1410,10 +1458,10 @@ class Employee implements Person {//class 'Employee' incorrectly implements inte
 }
 ```
 Пример с абстрактным классом:
+
 ```typescript
 abstract class Person {
   abstract name: string;
-
   display(): void {
     console.log(this.name)//нужно указать реализацию метода
   }
@@ -1446,10 +1494,10 @@ interface IAdult extends IHuman {
 }
 
 let empObj:IEmployee = {//всё ок, никакой ошибки
-    empCode:1,
-    name:"Bill",
-    gender:"Male",
-    hairColor: "dark"
+    empCode: 1,
+    name: "Bill",
+    gender: "Male",
+    hairColor: "dark",
 }
 ```
 Пример с абстрактным классом:
@@ -1551,13 +1599,16 @@ function format(target: Object, propertyKey: string) {
 class User {
   @format
   name: string;
+
   constructor(name: string) {
     this.name = name;
   }
+
   print(): void {
     console.log(this.name);
   }
 }
+
 let tom = new User('Tom');
 tom.print();//Mr./Mr.Tom
 tom.name = 'Tommy';
@@ -1568,4 +1619,4 @@ tom.print();//Mr./Mr.Tommy
 18. ### Что такое «.map» файл, как и зачем его использовать?
 
 Файл ".map" - это файл карты исходников, который можно использовать при выполнении
-отладки. Его можно сгенерировать, установив опцию компилятора sourseMap в true в файле tsconfig.json
+отладки. Его можно сгенерировать, установив опцию компилятора *sourseMap* в true в файле tsconfig.json
