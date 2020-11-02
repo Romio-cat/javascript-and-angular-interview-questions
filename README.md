@@ -1129,8 +1129,8 @@ enum NoYes {
 "use strict";
 var NoYes;
 (function (NoYes) {
-    NoYes[NoYes["No"] = 0] = "No";
-    NoYes[NoYes["Yes"] = 1] = "Yes";
+  NoYes[NoYes["No"] = 0] = "No";
+  NoYes[NoYes["Yes"] = 1] = "Yes";
 })(NoYes || (NoYes = {}));
 ```
 или же:
@@ -1181,31 +1181,25 @@ enum Status {
 более тщательно контролировать доступ к свойствам объекта.
 ```typescript
 class WashingMachine {
-  private amountOfPowderInMl: number;
-  readonly name: string;
-
-  constructor(name: string) {
-    this.name = name;
-  }
+  constructor(readonly name: string, private _amountOfPowderInMl: number) {}
 
   get amountOfPowderInMl(): number {
-    return this.amountOfPowderInMl;
+    return this._amountOfPowderInMl;
   }
 
   set amountOfPowderInMl(newAmount: number) {
     if (newAmount > 250) {
       console.log("Too much powder!");
     } else {
-      this.amountOfPowderInMl = newAmount;
+      this._amountOfPowderInMl = newAmount;
     }
   }
-
 }
 
-let washingMachine = new WashingMachine("Machine1000");
+let washingMachine = new WashingMachine("Machine1000", 0);
 
 washingMachine.amountOfPowderInMl = 300;//Too much powder!
-console.log(washingMachine.amountOfPowderInMl);//undefined, свойство не назначилось, так как не прошло проверку.
+console.log(washingMachine.amountOfPowderInMl);//0, свойство не назначилось, так как не прошло проверку.
 washingMachine.amountOfPowderInMl = 200;
 console.log(washingMachine.amountOfPowderInMl);//200
 ```
@@ -1245,6 +1239,9 @@ newUser1.print(); // Hello Leonardo, you are 23 years old!
 const newUser2 = new User("Leonardo", "23");//без generics так нельзя было бы сделать.
 newUser2.print();//Hello Leonardo, you are 23 years old!
 ```
+Без generics на предпоследней строке была бы ошибка. Ведь если для `age` был бы указан тип
+`number`, то при передаче строки в качестве второго аргумента появится ошибка "Argument of type 'string' is not assignable
+to parameter of type 'number'".
 Пример с интерфейсом:
 
 ```typescript
@@ -1288,11 +1285,11 @@ const client: Admin<Client> = {
 
 ```typescript
 module Vehicle {
-    export class Car {
-        constructor (public make: string, public model: string) { }
-    }
+  export class Car {
+    constructor (public make: string, public model: string) { }
+  }
 
-    let audiCar = new Car("Audi", "Q7");
+  let audiCar = new Car("Audi", "Q7");
 }
 
 let fordCar = new Vehicle.Car("Ford", "Figo");
@@ -1450,6 +1447,7 @@ if (typeof person === string) {
 ```typescript
 interface Person {
   name: string;
+
   display(name: string): void;//можно обозначить только, что этот метод должен присутствовать, но нельзя указать как именно он должен быть реализован.
 }
 
@@ -1462,6 +1460,7 @@ class Employee implements Person {//class 'Employee' incorrectly implements inte
 ```typescript
 abstract class Person {
   abstract name: string;
+
   display(): void {
     console.log(this.name)//нужно указать реализацию метода
   }
@@ -1478,7 +1477,7 @@ class Employee extends Person {//никакой ошибки не будет, м
 
 ```typescript
 interface IPerson {
-    name: string;
+  name: string;
 }
 
 interface IHuman {
@@ -1486,24 +1485,24 @@ interface IHuman {
 }
 
 interface IAdult extends IPerson {
-    empCode: number;
+  empCode: number;
 }
 
 interface IAdult extends IHuman {
-    hairColor: string
+  hairColor: string
 }
 
-let empObj:IEmployee = {//всё ок, никакой ошибки
-    empCode: 1,
-    name: "Bill",
-    gender: "Male",
-    hairColor: "dark",
+let empObj: IEmployee = {//всё ок, никакой ошибки
+  empCode: 1,
+  name: "Bill",
+  gender: "Male",
+  hairColor: "dark",
 }
 ```
 Пример с абстрактным классом:
 ```typescript
 abstract class Person {
-    name: string;
+  name: string;
 }
 
 abstract class Human {
@@ -1537,17 +1536,9 @@ interface Todo {
   description?: string;
 }
 
-function updateTodo(todo: Todo, fieldsToUpdate: Todo) {
-  return { ...todo, ...fieldsToUpdate };
-}
-
-const todo1 = {
+const todo: Todo = {
   title: "organize desk",
-  description: "clear clutter",
-};
-
-//следующее не вызовет ошибки, потому что свойства необязательные:
-const todo2 = updateTodo(todo1, {})
+};//это не вызовет ошибки, потому что свойства необязательные:
 ```
 
 - При помощи `Partial<Type>`:
@@ -1558,23 +1549,31 @@ interface Todo {
   description: string;
 }
 
-function updateTodo(todo: Todo, fieldsToUpdate: Partial<Todo>) {
-  return { ...todo, ...fieldsToUpdate };
+const todo: Partial<Todo> = {};//ошибки никакой не будет, потому что все поля интерфейса необязательные
+```
+
+а также:
+
+```typescript
+interface Todo {
+  title: string;
+  description: string;
 }
 
-const todo1 = {
-  title: "organize desk",
-  description: "clear clutter",
+type Part<T> = {
+  [P in keyof T]?: T[P];
 };
 
-const todo2 = updateTodo(todo1, {})//ошибки никакой не будет, потому что все поля интерфейса необязательные
+type PartialTodo = Part<Todo>;
+
+const todo: PartialTodo = {};
 ```
 17. ### Использовании декораторов свойств в TypeScript
 Декоратор свойства позволяет добавить ему дополнительное свойство:
 
 ```typescript
-function format(target: Object, propertyKey: string) {
-  let _val = this[propertyKey];// получаем значение свойства
+function format(target: any, propertyKey: string) {
+  let _val = target[propertyKey];// получаем значение свойства
 
   // геттер
   let getter = function() {
@@ -1582,12 +1581,12 @@ function format(target: Object, propertyKey: string) {
   };
 
   // сеттер
-  let setter = function(newVal) {
+  let setter = function(newVal: string) {
     _val = newVal;
   };
 
   // удаляем свойство
-  if (delete this[propertyKey]) {
+  if (delete target[propertyKey]) {
     // И создаем новое свойство с геттером и сеттером
     Object.defineProperty(target, propertyKey, {
       get: getter,
@@ -1610,10 +1609,10 @@ class User {
 }
 
 let tom = new User('Tom');
+
 tom.print();//Mr./Mr.Tom
 tom.name = 'Tommy';
 tom.print();//Mr./Mr.Tommy
-
 ```
 
 18. ### Что такое «.map» файл, как и зачем его использовать?
