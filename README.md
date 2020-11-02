@@ -1162,10 +1162,10 @@ console.log(thirdNumber);//7
 
 ```typescript
 enum PrintMedia {
-    Newspaper = "NEWSPAPER",
-    Newsletter = "NEWSLETTER",
-    Magazine = "MAGAZINE",
-    Book = "BOOK",
+  Newspaper = "NEWSPAPER",
+  Newsletter = "NEWSLETTER",
+  Magazine = "MAGAZINE",
+  Book = "BOOK",
 };
 ```
 Пример смешанного:
@@ -1231,17 +1231,18 @@ class User<T, U> {
   print(): void {
     console.log(`Hello ${this.name}, you are ${this.age} years old!`);
   }
-};
+}
 
 const newUser1 = new User("Leonardo", 23);
 newUser1.print(); // Hello Leonardo, you are 23 years old!
 
-const newUser2 = new User("Leonardo", "23");//без generics так нельзя было бы сделать.
+const newUser2 = new User("Leonardo", "23");//если для age был бы указан тип number, то была бы ошибка.
 newUser2.print();//Hello Leonardo, you are 23 years old!
 ```
 Без generics на предпоследней строке была бы ошибка. Ведь если для `age` был бы указан тип
 `number`, то при передаче строки в качестве второго аргумента появится ошибка "Argument of type 'string' is not assignable
 to parameter of type 'number'".
+
 Пример с интерфейсом:
 
 ```typescript
@@ -1303,7 +1304,7 @@ let fordCar = new Vehicle.Car("Ford", "Figo");
 function add(x: string, y: string): string;
 function add(x: number, y: number): number;
 function add(x: any, y: any): any {
-    return x + y;
+  return x + y;
 }
 
 let result1 = add(5, 4);
@@ -1321,31 +1322,32 @@ console.log(result3);//no overload match this call
 
 ```typescript
 class Box {
-    public x: number;
-    public y: number;
-    public height: number;
-    public width: number;
+  public x: number;
+  public y: number;
+  public height: number;
+  public width: number;
 
-    constructor();
-    constructor(obj: IBox);
-    constructor(obj?: any) {    
-        this.x = obj?.x|| 0;
-        this.y = obj?.y || 0;
-        this.height = obj?.height || 0;
-        this.width = obj?.width || 0;
-    }   
+  constructor();
+  constructor(obj: IBox);
+  constructor(obj?: any) {
+    this.x = obj?.x|| 0;
+    this.y = obj?.y || 0;
+    this.height = obj?.height || 0;
+    this.width = obj?.width || 0;
+  }   
 }
 ```
 - При помощи типа-объединения:
 
 ```typescript
 class foo {
-    private _name: any;
+  private _name: any;
 
-    constructor(name: string | number) {
-        this._name = name;
-    }
+  constructor(name: string | number) {
+    this._name = name;
+  }
 }
+
 let f1 = new foo("bar");
 let f2 = new foo(1);
 ```
