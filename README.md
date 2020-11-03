@@ -13,11 +13,11 @@ JavaScript and Angular Interview Questions &amp; Answers
 | 4| [Что такое функция высшего порядка](#что-такое-функция-высшего-порядка) |
 | 5| [Функциональное программирование](#Функциональное-программирование) |
 | 6| [Реактивное программирование](#Реактивное-программирование) |
-| 7| [Методологии разработка](#Методологии-разработка) |
+| 7| [Методологии разработки](#Методологии-разработки) |
 | 8| [ООП](#ООП) |
 | 9| [SOLID](#SOLID) |
 | II| [HTML](#HTML) |
-| III| [JavaScript](#CSS) |
+| III| [CSS](#CSS) |
 | IV| [JavaScript](#JavaScript) |
 | 1| [Типы данных](#Типы-данных) |
 | 2| [Область видимости](#область-видимости) |
@@ -60,6 +60,27 @@ JavaScript and Angular Interview Questions &amp; Answers
 | 16| [Как сделать все свойства интерфейса необязательными?](#Как-сделать-все-свойства-интерфейса-необязательными?)
 | 17| [Использовании декораторов свойств в TypeScript](#Использовании-декораторов-свойств-в-TypeScript)
 | 18| [Что такое «.map» файл, как и зачем его использовать?](#Что-такое-«.map»-файл,-как-и-зачем-его-использовать?)
+| VI| [Angular](#Angular) |
+| 1| [Метаданные компонента и какие из них обязательные](#Метаданные-компонента-и-какие-из-них-обязательные)
+| 2| [Хуки компонента](#Хуки-компонента)
+| 3| [Как написать структурную директиву](#Как-написать-структурную-директиву)
+| 4| [Разница между ViewChild и ContentChild](#Разница-между-ViewChild-и-ContentChild)
+| 5| [ngContent, ngContainer, ngTemplate](#ngContent,-ngContainer,-ngTemplate)
+| 6| [hostListener и hostBinding](#hostListener-и-hostBinding)
+| 7| [change detection](#change-detection)
+| 8| [dependency injection](#dependency-injection)
+| 9| [Как заинжектить переменную](#Как-заинжектить-переменную)
+| 10| [Разница между объявлениями сервиса в компоненте или модуле](#Разница-между-объявлениями-сервиса-в-компоненте-или-модуле)
+| 11| [Виды форм](#Виды-форм)
+| 12| [Что такое router-outlet](#Что-такое-router-outlet)
+| 13| [Как создать дочерний маршрут](#Как-создать-дочерний-маршрут)
+| 14| [Виды guard](#Виды-guard)
+| 15| [Виды pipe](#Виды-pipe)
+| 16| [Для чего испольуется zone.js](#Для-чего-испольуется-zone.js)
+| 17| [Tasks в zone.js](#Tasks-в-zone.js)
+| 18| [Как протестировать асинхронный код](#Как-протестировать-асинхронный-код)
+| 19| [Любые способы передать данные между двумя компонентами, даже самые нелепые](#Любые-способы-передать-данные-между-двумя-компонентами,-даже-самые-нелепые)
+| 20| [Разница между AOT, JIT](#Разница-между-AOT,-JIT)
 
 ## Основы
 
@@ -516,9 +537,9 @@ let obj = {
   letters: ['a', 'b', 'c'],
 
   showLetters() {
-    this.letters.forEach(item => ${this.name}: ${item});
+    this.letters.forEach(item => `${this.name}: ${item}`);
   }
-}
+};
 
 obj.showLeters();//obj: a, obj: b, obj: c
 ```
@@ -752,9 +773,9 @@ console.log(lastName);
 'use strict';
 
 let menu = {
-  firstMeal: "soup";
-  secondMeal: "pasta";
-  beverage: "tea";
+  firstMeal: "soup",
+  secondMeal: "pasta",
+  beverage: "tea"
 };
 
 let {myFirstMeal, mySecondMeal, myBeverage} = menu;
@@ -898,7 +919,7 @@ function Animal(name) {
 
 Animal.prototype.sleep = function(hours) {
   return `${this.name} спит ${hours} часов в сутки`;
-}
+};
 
 let koala = new Animal('Koala');
 
@@ -912,8 +933,8 @@ console.log(koala.__proto__ === Animal.prototype);//true
 
 ```javascript
 function getHumanReadableMessage(response) {
-  if (response.data.hasSucceded) {
-    return `Your action succeded because: ${response.message}`;
+  if (response.data.hasSucceeded) {
+    return `Your action succeeded because: ${response.message}`;
   }
 
   return `Something went wrong:(`;
@@ -921,12 +942,12 @@ function getHumanReadableMessage(response) {
 
 const apiResponse = {
   data: {
-    hasSucceded: true,
-    message: `Suceessful log in.`,
+    hasSucceeded: true,
+    message: `Successful log in.`,
   },
 };
 
-console.log(getHumanReadableResponse(apiResponse));//Your action succeded because: undefined
+console.log(getHumanReadableResponse(apiResponse));//Your action succeeded because: undefined
 ```
 То есть, в приведённом выше примере не будет даже ошибки при выполнении, потому что в JS мы можем обращаться к
 несуществующим свойствам объекта. Но это ведь не то, что нужно.
@@ -935,14 +956,14 @@ console.log(getHumanReadableResponse(apiResponse));//Your action succeded becaus
 ```typescript
 interface ApiResponse {
   data: {
-    hasSucceded: boolean;
+    hasSucceeded: boolean;
     message: string;
   };
 }
 
 function getHumanReadableResponse(response: ApiResponse) {
-  if (response.data.hasSucceded) {
-    return `Your action succeded because: ${response.message}`;//ещё до компиляции получим ошибку, что свойство 'message' dosn't exist in type ApiResponse
+  if (response.data.hasSucceeded) {
+    return `Your action succeeded because: ${response.message}`;//ещё до компиляции получим ошибку, что свойство 'message' doesn't exist in type ApiResponse
   }
 
   return `Something went wrong:(`;
@@ -950,10 +971,10 @@ function getHumanReadableResponse(response: ApiResponse) {
 
 const apiResponse = {
   data: {
-    hasSucceded: true,
-    message: `Suceessful log in.`,
+    hasSucceeded: true,
+    message: `Successful log in.`,
   },
-}
+};
 
 getHumanReadableResponse(apiResponse);
 ```
@@ -1001,7 +1022,7 @@ enum Direction {
   Down,
   Left,
   Right
-};
+}
 ```
 
 [Подробнее в ответе на вопрос 4](#Что-такое-Enum-и-во-что-он-компилируется).
@@ -1116,12 +1137,12 @@ class CarModelPrototype implements Car {
 enum NoYes {
   No,
   Yes,
-};
+}
 
 enum NoYes {
   No = 0,
   Yes = 1,
-};
+}
 ```
 К слову, перечисление с примера выше компилируется в следующее:
 
@@ -1150,7 +1171,7 @@ enum AcceptedNumber {
   First = 5,
   Second,
   Third,
-};
+}
 
 let secondNumber: AcceptedNumber = AcceptedNumber.Second;
 let thirdNumber: AcceptedNumber = AcceptedNumber.Third;
@@ -1166,7 +1187,7 @@ enum PrintMedia {
   Newsletter = "NEWSLETTER",
   Magazine = "MAGAZINE",
   Book = "BOOK",
-};
+}
 ```
 Пример смешанного:
 ```typescript
@@ -1174,7 +1195,7 @@ enum Status {
   Active = "Active",
   Deactivate = 1,
   Pending
-};
+}
 ```
 5. ### Что такое геттеры и сеттеры в TypeScript?
 ***Геттеры и сеттеры*** - это методы класса (с ключевыми словами `get` и `set`), которые позволяют перехватить доступ к свойствам объектов. Они позволяют
@@ -1200,6 +1221,7 @@ let washingMachine = new WashingMachine("Machine1000", 0);
 
 washingMachine.amountOfPowderInMl = 300;//Too much powder!
 console.log(washingMachine.amountOfPowderInMl);//0, свойство не назначилось, так как не прошло проверку.
+
 washingMachine.amountOfPowderInMl = 200;
 console.log(washingMachine.amountOfPowderInMl);//200
 ```
@@ -1248,17 +1270,17 @@ to parameter of type 'number'".
 ```typescript
 interface User {
   firstName: string;
-};
+}
 
 interface Client {
   firstName: string;
   lastName: string;
-};
+}
 
 interface Admin<T> {
   values: T;
   isAdmin: true;
-};
+}
 
 const user: Admin<User> = {
   values: {
@@ -1372,7 +1394,7 @@ const wish: Wish = { fast: true, quality: true, cheap: true } // Не компи
 type RealProfile = Pick<TwitterProfile, 'drinkCoffee'>;
 
 // С интерфейсом не работает
-interface RealProfile extends Pick<TwitterProfile, 'drinkCoffee'> {};
+interface RealProfile extends Pick<TwitterProfile, 'drinkCoffee'> {}
 ```
 - Интерфейсы поддерживают declaration merging - то есть слияние интерфейсов с одинаковыми именами:
 
@@ -1389,11 +1411,11 @@ const employee: Employee = { age: 23 };//Property 'salary' is missing in type '{
 ```
 С `type` такого не происходит:
 ```typescript
-type Employee = {//Dublicate identifier 'Employee'
+type Employee = {//Duplicate identifier 'Employee'
   salary: number;
 }
 
-type Employee = {//Dublicate identifier 'Employee'
+type Employee = {//Duplicate identifier 'Employee'
   age: number;
 }
 
@@ -1449,7 +1471,6 @@ if (typeof person === string) {
 ```typescript
 interface Person {
   name: string;
-
   display(name: string): void;//можно обозначить только, что этот метод должен присутствовать, но нельзя указать как именно он должен быть реализован.
 }
 
@@ -1511,12 +1532,12 @@ abstract class Human {
   gender: string;
 }
 
-abstract class Adult extends Person {//Dublicate identifier 'Adult'
+abstract class Adult extends Person {//Duplicate identifier 'Adult'
   name: string;
   empCode: number;
 }
 
-abstract class Adult extends Human {//Dublicate identifier 'Adult'
+abstract class Adult extends Human {//Duplicate identifier 'Adult'
   hairColor: string;
   gender: string;
 }
@@ -1621,3 +1642,25 @@ tom.print();//Mr./Mr.Tommy
 
 Файл ".map" - это файл карты исходников, который можно использовать при выполнении
 отладки. Его можно сгенерировать, установив опцию компилятора *sourseMap* в true в файле tsconfig.json
+
+## Angular
+1. ### Метаданные компонента и какие из них обязательные
+2. ### Хуки компонента
+3. ### Как написать структурную директиву
+4. ### Разница между ViewChild и ContentChild
+5. ### ngContent, ngContainer, ngTemplate
+6. ### hostListener и hostBinding
+7. ### change detection
+8. ### dependency injection
+9. ### Как заинжектить переменную
+10. ### Разница между объявлениями сервиса в компоненте или модуле
+11. ### Виды форм
+12. ### Что такое router-outlet
+13. ### Как создать дочерний маршрут
+14. ### Виды guard
+15. ### Виды pipe
+16. ### Для чего испольуется zone.js
+17. ### Tasks в zone.js
+18. ### Как протестировать асинхронный код
+19. ### Любые способы передать данные между двумя компонентами, даже самые нелепые
+20. ### Разница между AOT, JIT
