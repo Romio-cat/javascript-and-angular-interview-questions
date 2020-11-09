@@ -1646,7 +1646,7 @@ tom.print();//Mr./Mr.Tommy
 ## Angular
 1. ### Метаданные компонента и какие из них обязательные
 
-Метаданные - это то, что предоставляет дополнительные данные о классе для Angular.
+***Метаданные*** - это то, что предоставляет дополнительные данные о классе для Angular.
 Метаданные определяются декоратором (функция, которая добавляет метаданные в класс).
 Метаданых существует достаточно много. Некоторые из них:
 - `selector` (CSS-селектор, который определяет компонент в шаблоне)
@@ -1662,6 +1662,7 @@ tom.print();//Mr./Mr.Tommy
 Ссылка: https://angular.io/api/core/Component
 
 2. ### Хуки компонента
+
 ***Lifecycle hooks*** - это методы жизненного цикла компонента (Component Lifecycle), которые
 описывают каждый из этапов цикла.
 Существует 8 методов жизненного цикла компонента:
@@ -1700,6 +1701,7 @@ export class ParentComponent {
 }
 ```
 ![alt text](ngOnChanges1.png "При первом вызове")
+
 ![alt text](ngOnChanges2.png "При изменении входного значения")
 
 - OnInit
@@ -1779,6 +1781,7 @@ export class UnlessDirective {
 - метод createEmbeddedView() производит рендеринг шаблона  
 
 Ссылка: https://metanit.com/web/angular2/3.6.php
+
 4. ### Разница между ViewChild и ContentChild
 
 И `@ViewChild`, и `@ContentChild` являются декораторами свойств для доступа к дочерним элементам. Однако,
@@ -1843,24 +1846,28 @@ export class ParentComponent {
 
 И результатом будет:
 
--Hello, First View Child!
--Hello, First Content Child!
--Hello, Child!
+- Hello, First View Child!
+- Hello, First Content Child!
+- Hello, Child!
 
 5. ### ngContent, ngContainer, ngTemplate
-`<ng-template>` - это шаблонный элемент, который используется со структурными директивами.
+
+- `<ng-template>` - это шаблонный элемент, который используется со структурными директивами.
 Элемент, к которому применяется структурная директива, оборачивается в `<ng-template>`.
-`<ng-container>` - это группирующий элемент, который используется, чтобы избежать очень большой вложенности
+- `<ng-container>` - это группирующий элемент, который используется, чтобы избежать очень большой вложенности
 тегов при использовании структурных директив.
-`ng-content` - это элемент, который позволяет родительским элементам внедрять html в дочерние элементы.
+- `ng-content` - это элемент, который позволяет родительским элементам внедрять html в дочерние элементы.
+
 Статья: https://www.freecodecamp.org/news/everything-you-need-to-know-about-ng-template-ng-content-ng-container-and-ngtemplateoutlet-4b7b51223691/
+
 6. ### hostListener и hostBinding
+
 `@HostListener` - это декоратор, который позволяет реагировать на DOM - событие, произошедшее на элементе, из директивы.
 `@HostBinding` - это декоратор, который позволяет устанавливать свойства элемента через директиву.
 
 Пример с `@HostListener`:
 
-`typescript
+```typescript
 //директива, которая меняет цвет элемента при наведении мыши:
 import { Directive, ElementRef, Renderer2, HostListener } from '@angular/core';
 
@@ -1882,16 +1889,16 @@ export class ChangeColorDirective {
      this.renderer.setStyle(this.el.nativeElement, 'color', color);
    }
 }
-`
+```
 
-`HTML
+```HTML
 //app.component.html
 <h2 appChangeColor>{{title}}</h2>
-`
+```
 
 Если в примере выше также использовать `@HostBinding`, то всё можно переписать так:
 
-`typescript
+```typescript
 import { Directive, HostListener, HostBinding } from '@angular/core';
 
 @Directive({
@@ -1909,15 +1916,19 @@ export class ChangeColorDirective {
      this.color = "black";
    }
 }
-`
+```
 Ссылка: https://dzone.com/articles/what-are-hostbinding-and-hostlistener-in-angular
+
 7. ### change detection
+
 ***ChangeDetection*** - механизм отслеживания изменений, который отвечает за своевременное отображение в шаблоне
 данных при их изменении. Обычно запускается при возникновении событий, выполнении HTTP-запросов или вызове `setTimeout()` и `setInterval()`.
 
 Работает по одной из двух стратегий:
+
 - Default (запуск при любом действии пользователя или изменения состоянии компонента)
 Default не всегда есть удобной, ибо если изменяется компонент, то затрагиваются и дочерние.
+
 Например:
 
 ```typescript
@@ -1946,16 +1957,18 @@ import { Component } from '@angular/core';
 export class ChildComponent {
   child() {
     console.log("child");
-    return "child"
+    return "child";
   }
 }
 
 ```
 ![alt text](default1.png "При запуске")
+
 ![alt text](default2.png "При нажатии клавиши").
 
 Как видим, выявление изменения в родителе повлияло на дочерний элемент.
-- OnPush (запускается в момент вызова стадии жизненного цикла компонента OnChanges и при любом изменении значения используемых в шаблоне объектов Observable).
+
+- OnPush:
 
 ```typescript
 //добавим в child changeDetection: ChangeDetectionStrategy.OnPush
@@ -1970,21 +1983,23 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 export class ChildComponent {
   child() {
     console.log("child");
-    return "child"
+    return "child";
   }
 }
 ```
-![alt text](default2.png "При нажатии клавиши при OnPush").
+![alt text](OnPush.png "При нажатии клавиши при OnPush").
 
 Вторая стратегия используется для повышения эффективности работы приложения (потому что снижается количество вызовов
 механизмов отслеживания изменений).
 
-Также существует ChangeDetectionRef
 Ссылка: https://webdraftt.com/tutorial/angular-change-detection
 
 8. ### dependency injection
 ***Dependency Injection (DI)*** - это паттерн программирования, одна из реализаций принципа *Inversion of Control (IoC)*, то есть написания слабо связанного кода. Суть IoC в том, что каждый компонент должен быть как можно более изолированный от других и не должен полагаться в своей работе на детали реализации других компонентов.
-Без DI нужно было бы, например, самостоятельно создавать инстансы классов, от которых зависит другой класс. Однако, если бы, например, менялись параметры конструктора этих классов, то эти изменения повлекли бы переделывание кода класса, который зависит от этих других классов. Это делает код трудно поддерживаемым, не переиспользуемым и плохо тестируемым. При использовании DI, создание инстансов выносится за пределы зависимого класса. Зависимый класс при этом просто запрашивает нужные зависимости, понятия не имея, что нужно для их создания и т.д.
+
+Без DI нужно было бы, например, самостоятельно создавать инстансы классов, от которых зависит другой класс. Однако, если бы, например, менялись параметры конструктора этих классов, то эти изменения повлекли бы переделывание кода класса, который зависит от этих других классов. Это делает код трудно поддерживаемым, не переиспользуемым и плохо тестируемым.
+
+При использовании DI, создание инстансов выносится за пределы зависимого класса. Зависимый класс при этом просто запрашивает нужные зависимости, понятия не имея, что нужно для их создания и т.д.
 
 Пример DI в Angular:
 
@@ -1996,9 +2011,6 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class LoggerService {
-
-  constructor() { }
-
   info(msg: string) {
     console.log(msg);
   }
@@ -2045,17 +2057,22 @@ export class AppComponent implements OnInit {
 ```
 
 Ссылка: https://medium.com/coding-blocks/power-of-angular-dependency-injection-b981faa9c0de
+
 10. ### Разница между объявлениями сервиса в компоненте или модуле
+
 Объявление сервиса в компоненте означает, что сервис очень тесно связан именно с этим компонентом
 и не будет использоваться где-либо ещё в приложении.
 Объявление же сервиса в модуле означает, что во всем приложении будет один инстанс сервиса, и он может быть использован где-угодно.
+
 Ссылка: https://www.pluralsight.com/guides/registering-a-service-with-an-angular-module-or-component
+
 11. ### Виды форм
+
 Формы в Angular бывают двух видов: **reactive** и **template-driven**.
 
 Пример reactive:
 
-`typescript
+```typescript
 import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
@@ -2069,10 +2086,10 @@ import { FormControl } from '@angular/forms';
 export class FavouriteColorComponent {
   favouriteColorControl = new FormControl('');
 }
-`
+```
 Пример template-driven:
 
-`typescript
+```typescript
 import { Component } from "@angular/core"
 
 @Component({
@@ -2083,28 +2100,79 @@ import { Component } from "@angular/core"
 })
 
 export class FavouriteColorComponent {
-  favouriteColor = " "
+  favouriteColor = " ";
 }
+```
 
-`
 12. ### Что такое router-outlet
-RouterOutlet - это директива, которая используется как компонент `<router-outlet>`. Местоположение
+
+***RouterOutlet*** - это директива, которая используется как компонент `<router-outlet>`. Местоположение
 этого компонента в шаблоне указывает на местоположение, где должны быть отображены компоненты при роутинге.
+
+Пример использования в ответе на следующий вопрос.
+
 13. ### Как создать дочерний маршрут
 
 Чтобы создать дочерний маршрут нужно:
 - В шаблоне компонента, для которого создаются дочерние маршруты нужно добавить компонент `<router-outlet>`, где будут
 отображаться компоненты.
 - В *AppRoutingModule* в массиве routes в объекте, где указан путь к нужному клмпоненту, добавить поле children, которое также является масивом объектов, в каждом из которых также есть поля `path` и `component`.
+
+Пример:
+
+```typescript
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  template: `<p>child works!</p>`,
+})
+export class ChildComponent {}
+```
+```typescript
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-parent',
+  template: `
+    <p>parent works!</p>
+    <router-outlet></router-outlet>
+    `,
+})
+export class ParentComponent {}
+```
+
+И потом в app.component.html:
+
+```HTML
+<router-outlet></router-outlet>
+```
+
+И в app-routing.module.ts:
+
+```typescript
+const routes: Routes = [
+  {
+    path: "parent",
+    component: ParentComponent,
+    children: [{
+    path: "child", component: ChildComponent
+  }]
+}
+];
+```
+
 Ссылка: https://angular.io/guide/router#nesting-routes
+
 14. ### Виды guard
 
 ***Guards*** бывают следующими:
-- CanActivate
-- CanActiveChild
-- CanDeactivate
-- Resolve
-- CanLoad
+
+- CanActivate (разрешает/запрещает доступ к маршруту)
+- CanActiveChild (разрешает/запрещает доступ к дочернему маршруту)
+- CanDeactivate (разрешает/запрещает уход с текущего маршрута)
+- Resolve (выполняет какое-либо днйствие перед переходом на маршрут, обычно - ожидание данных с сервера)
+- CanLoad (разрешает/запрещает загрузку модуля, загружаемого асинхронно)
 
 Пример использования простого guard:
 
@@ -2149,10 +2217,13 @@ export class AppRoutingModule { }
 <router-outlet></router-outlet>
 ```
 Поскольку guard возвращает false, то при попытке доступа к AdminHomeComponent через /admin, будет видно только **Main Page**.
+
 Если же поменять возращаемое значение guard на true, то попытка получения доступа к AdminHomeComponent будет удачной.
 
 Ссылка: https://www.youtube.com/watch?v=VRf21fum3nk
+
 15. ### Виды pipe
+
 ***Pipes*** бывают двух видов: pure (чистые) и impure (грязные, нечистые).
 
 Разница между чистыми и нечистыми pipes в том, что первые отслеживают изменения в непримитивах только тогда, когда меняется сама ссылка, а не значение по ссылке; вторые же отслеживают все изменения.
@@ -2206,7 +2277,9 @@ pipe сделать нечистой:
 И тогда всё будет работаь как надо:
 ![alt text](ImpurePipe.png "При использовании Impure pipe")
 Ссылка: https://metanit.com/web/angular2/8.3.php
+
 16. ### Для чего используется zone.js
+
 Zone.js используется, чтобы сделать возможным change detection. Можно отключить. Для этого нужно в файле **main.ts** сделать следующее:
 
 ```typescript
@@ -2214,21 +2287,27 @@ platformBrowserDynamic().bootstrapModule(AppModule, {ngZone: "noop"})
   .catch(err => console.error(err));
 ```
 https://www.youtube.com/watch?v=wQCiE8040gg
+
 17. ### Tasks в zone.js
+
 В zone.js существуют следующие виды тасков:
 - Microtask
 
-Выполняется сразу после какой-то текущей задачи. Нельзя отменить, поэтому точно сработает один раз.
+Выполняется сразу после какой-то текущей задачи. Нельзя отменить, поэтому точно сработает один раз. Сюда относятся Promisee.then, process.nextTick и др.
+
 - Macrotask
 
-Можно запланировать. Можно отменять. Также, выполняется после какой-то задержки.
+Можно запланировать. Можно отменять. Также, выполняется после какой-то задержки. Например, setTimeout
+
 - EventTask
 
 "Слушает" какое-то будущее событие. Какая задержка будет перед выполнением - непонятно, может не произойи ни разу, а может
-много раз.
+много раз. Например, EventTarget's EventListener, EventEmitter's EventListener.
 
 https://github.com/angular/zone.js/blob/master/dist/zone.js.d.ts
+
 18. ### Как протестировать асинхронный код
+
 При помощи `fakeAsync`, а также `flush`, `tick`, `flushMicrotasks`.
 
 Например, есть такой асинхронный код в сервисе:
@@ -2388,7 +2467,9 @@ export class ChildComponent implements OnInit {
   }
 }
 ```
+
 20. ### Разница между AOT и JIT
+
 При ***AOT (Ahead of Time Compilation)*** компиляция происходит во время сборки (build time).  
 
 При ***JIT (Just in Time Compilation)*** компиляция происходит во время выполнения (run time).
