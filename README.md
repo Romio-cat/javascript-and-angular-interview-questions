@@ -1648,22 +1648,16 @@ tom.print();//Mr./Mr.Tommy
 
 Метаданные - это то, что предоставляет дополнительные данные о классе для Angular.
 Метаданные определяются декоратором (функция, которая добавляет метаданные в класс).
-Существует 13 видов метаданых:
-- `selector`
-- `changeDetection`
-- `viewProviders`
-- `moduleId`
-- `templateUrl`
-- `template`
-- `styleUrls`
-- `styles`
-- `animations`
-- `encapsulation`
-- `interpolation`
-- `entryComponents`
-- `preserveWhitespaces`
+Метаданых существует достаточно много. Некоторые из них:
+- `selector` (CSS-селектор, который определяет компонент в шаблоне)
+- `changeDetection` (указывает на стратегию отслеживания именений для компонента))
+- `templateUrl` (путь к файлу шаблона для этого компонента)
+- `template` (инлайновый шаблон)
+- `styleUrls` (путь/пути к файлам стилей для этого компонента)
+- `styles` (инлайновые стили)
+- `encapsulation` (правило инкапсуляции для шаблона и стилей)
 
-Обязательными являются `selector` и `template`/`templateUrl`?
+Обязательными являются `selector` и `template`/`templateUrl`.
 
 Ссылка: https://angular.io/api/core/Component
 
@@ -1671,14 +1665,74 @@ tom.print();//Mr./Mr.Tommy
 ***Lifecycle hooks*** - это методы жизненного цикла компонента (Component Lifecycle), которые
 описывают каждый из этапов цикла.
 Существует 8 методов жизненного цикла компонента:
+
 - OnChanges
+
+Метод ngOnChanges( ) вызывается при изменении входных свойств компонента. Метод в качестве параметра принимает объект-экземпляр класса Simple Changes, в котором ключами являются имена входных свойств, значения которых поменялись. Значениями этих ключей являются объекты со свойтсвами `previousValue` и `currentValue`.
+
+```typescript
+import { Component, Input, SimpleChanges } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  template:`{{childAge}}`,
+})
+export class ChildComponent {
+  @Input() childAge: number;
+
+  ngOnChanges(changes: SimpleChanges) {
+    console.log(changes);
+  }
+}
+```
+```typescript
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-parent',
+  template: `
+    <app-child [childAge]="age"></app-child>
+    <input [(ngModel)]="age">
+  `,
+})
+export class ParentComponent {
+  age: number = 21;
+}
+```
+![alt text](ngOnChanges1.png "При первом вызове")
+![alt text](ngOnChanges2.png "При изменении входного значения")
+
 - OnInit
+
+Метод ngOnInit() вызывается только один раз. Используется для инициализации свойств компонента.
+[Пример использования был дан в ответе на вопрос 19.](#Любые-способы-передать-данные-между-двумя-компонентами,-даже-самые-нелепые)
+
 - DoCheck
+
+Метод вызывается каждый раз при запуске механизма отслеживания изменений и один раз после ngOnInit().
+[Пример исаользования был дан при ответе на вопрос 15.](#Виды-pipe)
+
 - AfterContentInit
+
+Метод вызывается один раз сразу после первого вызова ngDoCheck() и означает, что в шаблоне был инициализирован контент. [Пример использования дан в ответе на вопрос 4.](#Разница-между-ViewChild-и-ContentChild)
+
 - AfterContentChecked
+
+Вызов метода ngAfterContentChecked() происходит сразу после вызова ngAfterContentInit(). Далее метод вызывается при каждом запуске отслеживания изменений относительно *контента*.
+
 - AfterViewInit
+
+Вызывается один раз после первого вызова ngAfterContentChecked() и означает инициализацию визуальной части компонента, включая его дочерние компоненты. Используется для получения значений переменых, обёрнутых @ViewChild()/@ViewChildren().
+[Пример использования дан в ответе на вопрос 4.](#Разница-между-ViewChild-и-ContentChild)   
 - AfterViewChecked
+
+Метод ngAfterViewChecked() вызывается сразу после ngAfterViewInit(). Далее - при каждом запуске отслеживания изменений относительно *визуальной части компонента*.
+
 - OnDestroy
+
+Метод ngOnDestroy() вызывается непосредственно перед удалением компонента из DOM. Используется для освобождения ресурсов.
+
+Ссылка: https://webdraftt.com/tutorial/component-lifecycle
 
 3. ### Как написать структурную директиву
 
@@ -1696,8 +1750,8 @@ export class UnlessDirective {
   }
 
   constructor(
-    private templateRef: TemplateRef<any>,//he actual content that is going to be rendered (WHAT is going to be)
-    private vcRef: ViewContainerRef//WHERE is going to be
+    private templateRef: TemplateRef<any>,
+    private vcRef: ViewContainerRef
   )  { }
 }
 ```
@@ -2224,5 +2278,118 @@ tick(2000);
 Ссылка: https://www.youtube.com/watch?v=4evLVxAt1xU
 
 19. ### Любые способы передать данные между двумя компонентами, даже самые нелепые
+- при помощи `@Input`:
+
+```typescript
+//компонент, КУДА данные передаются
+import { Component, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  template:`Name: {{name}}`,
+})
+export class ChildComponent {
+  @Input() name: string;
+}
+```
+```typescript
+//компонент, ОТКУДА данные передаются
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-parent',
+  template: `<app-child [name]="name"></app-child>`,
+})
+export class ParentComponent {
+  name: string = "Victoria";
+}
+```
+- При помощи @Output и EventEmitter:
+
+```typescript
+//компонент, ОТКУДА данные передаются
+import { Component, Output, EventEmitter} from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  template:`<div (click)="sendName.emit('Victoria')">Click to get name</div>`,
+})
+export class ChildComponent {
+  @Output() sendName = new EventEmitter();
+}
+```
+```typescript
+//компонент, КУДА данные передаются
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-parent',
+  template: `
+    <app-child (sendName)="getName($event)"></app-child>
+    <p>Hi! My name is {{name}}</p>
+  `,
+})
+export class ParentComponent {
+  name: string;
+  getName(name: string) {
+    this.name = name;
+  }
+}
+```
+- При помощи сервиса:
+
+```typescript
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ServiceService {
+  someData: number = 30;
+}
+```
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { ServiceService } from '../service.service';
+
+@Component({
+  selector: 'app-parent',
+  template: `
+    <app-child></app-child>
+    <p>{{parentAge}}</p>
+  `,
+})
+export class ParentComponent implements OnInit{
+  parentAge: number;
+
+  constructor(private service: ServiceService) {}
+
+  ngOnInit() {
+    this.parentAge = this.service.someData;
+    this.service.someData = 10;
+  }
+}
+```
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { ServiceService } from "../service.service";
+
+@Component({
+  selector: 'app-child',
+  template:`<div>{{childAge}}</div>`,
+})
+export class ChildComponent implements OnInit {
+  childAge: number;
+
+  constructor(private service: ServiceService) {}
+
+  ngOnInit() {
+    this.childAge = this.service.someData;
+  }
+}
+```
 20. ### Разница между AOT и JIT
+При ***AOT (Ahead of Time Compilation)*** компиляция происходит во время сборки (build time).  
+
+При ***JIT (Just in Time Compilation)*** компиляция происходит во время выполнения (run time).
 https://www.youtube.com/watch?v=EhnD7qHDerc
