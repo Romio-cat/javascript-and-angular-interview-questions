@@ -1700,9 +1700,9 @@ export class ParentComponent {
   age: number = 21;
 }
 ```
-![alt text](ngOnChanges1.png "При первом вызове")
+![alt text](images/ngOnChanges1.png "При первом вызове")
 
-![alt text](ngOnChanges2.png "При изменении входного значения")
+![alt text](images/ngOnChanges2.png "При изменении входного значения")
 
 - OnInit
 
@@ -1962,9 +1962,9 @@ export class ChildComponent {
 }
 
 ```
-![alt text](default1.png "При запуске")
+![alt text](images/default1.png "При запуске")
 
-![alt text](default2.png "При нажатии клавиши").
+![alt text](images/default2.png "При нажатии клавиши").
 
 Как видим, выявление изменения в родителе повлияло на дочерний элемент.
 
@@ -1987,7 +1987,7 @@ export class ChildComponent {
   }
 }
 ```
-![alt text](OnPush.png "При нажатии клавиши при OnPush").
+![alt text](images/OnPush.png "При нажатии клавиши при OnPush").
 
 Вторая стратегия используется для повышения эффективности работы приложения (потому что снижается количество вызовов
 механизмов отслеживания изменений).
@@ -2264,7 +2264,7 @@ export class ChildComponent {
 }
 ```
 Поскольку изначально все pipes являются pure, то будет происходить следующее:
-![alt text](PurePipe.png "При использовании Pure pipe")
+![alt text](images/PurePipe.png "При использовании Pure pipe")
 Как можно увидеть, новый элемент добавился в массив, но это никак не отобразилось, потому что для этого следует
 pipe сделать нечистой:
 
@@ -2275,7 +2275,7 @@ pipe сделать нечистой:
 })
 ```
 И тогда всё будет работаь как надо:
-![alt text](ImpurePipe.png "При использовании Impure pipe")
+![alt text](images/ImpurePipe.png "При использовании Impure pipe")
 Ссылка: https://metanit.com/web/angular2/8.3.php
 
 16. ### Для чего используется zone.js
