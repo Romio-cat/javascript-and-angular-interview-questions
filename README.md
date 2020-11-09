@@ -1987,6 +1987,7 @@ export class ChildComponent {
   }
 }
 ```
+
 ![alt text](images/OnPush.png "При нажатии клавиши при OnPush").
 
 Вторая стратегия используется для повышения эффективности работы приложения (потому что снижается количество вызовов
@@ -2264,7 +2265,9 @@ export class ChildComponent {
 }
 ```
 Поскольку изначально все pipes являются pure, то будет происходить следующее:
+
 ![alt text](images/PurePipe.png "При использовании Pure pipe")
+
 Как можно увидеть, новый элемент добавился в массив, но это никак не отобразилось, потому что для этого следует
 pipe сделать нечистой:
 
@@ -2275,7 +2278,9 @@ pipe сделать нечистой:
 })
 ```
 И тогда всё будет работаь как надо:
+
 ![alt text](images/ImpurePipe.png "При использовании Impure pipe")
+
 Ссылка: https://metanit.com/web/angular2/8.3.php
 
 16. ### Для чего используется zone.js
@@ -2286,7 +2291,7 @@ Zone.js используется, чтобы сделать возможным c
 platformBrowserDynamic().bootstrapModule(AppModule, {ngZone: "noop"})
   .catch(err => console.error(err));
 ```
-https://www.youtube.com/watch?v=wQCiE8040gg
+Ссылка: https://www.youtube.com/watch?v=wQCiE8040gg
 
 17. ### Tasks в zone.js
 
