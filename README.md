@@ -1646,7 +1646,7 @@ tom.print();//Mr./Mr.Tommy
 ## Angular
 1. ### Метаданные компонента и какие из них обязательные
 
-***Метаданные*** - это то, что предоставляет дополнительные данные о классе для Angular.
+***Метаданные*** - это конфигурация (объект), которая определяет, как компонент будет работать в runtime.
 Метаданные определяются декоратором (функция, которая добавляет метаданные в класс).
 Метаданых существует достаточно много. Некоторые из них:
 - `selector` (CSS-селектор, который определяет компонент в шаблоне)
@@ -1664,29 +1664,14 @@ tom.print();//Mr./Mr.Tommy
 2. ### Хуки компонента
 
 ***Lifecycle hooks*** - это методы жизненного цикла компонента (Component Lifecycle), которые
-описывают каждый из этапов цикла.
-Существует 8 методов жизненного цикла компонента:
+описывают каждый из этапов цикла. Существует 8 методов жизненного цикла компонента:
 
-- OnChanges
+- `OnChanges`
 
-Метод ngOnChanges( ) вызывается при изменении входных свойств компонента. Метод в качестве параметра принимает объект-экземпляр класса Simple Changes, в котором ключами являются имена входных свойств, значения которых поменялись. Значениями этих ключей являются объекты со свойтсвами `previousValue` и `currentValue`.
+Метод `ngOnChanges()` вызывается при изменении входных свойств компонента, которые "попадают" в класс при помощи `@Input()`. Метод в качестве параметра принимает объект-экземпляр класса `SimpleChanges`, в котором ключами являются имена входных свойств, значения которых поменялись. Значениями этих ключей являются объекты со свойствами `previousValue` и `currentValue`. Можно вызывать, когда меняются какие-то данные, приходящие извне, если они для чего-то используются.
 
 ```typescript
-import { Component, Input, SimpleChanges } from '@angular/core';
-
-@Component({
-  selector: 'app-child',
-  template:`{{childAge}}`,
-})
-export class ChildComponent {
-  @Input() childAge: number;
-
-  ngOnChanges(changes: SimpleChanges) {
-    console.log(changes);
-  }
-}
-```
-```typescript
+//parent.component.ts
 import { Component } from '@angular/core';
 
 @Component({
@@ -1700,39 +1685,57 @@ export class ParentComponent {
   age: number = 21;
 }
 ```
+```typescript
+//child.component.ts
+import { Component, Input, SimpleChanges, OnChanges } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  template:`{{ childAge }}`,
+})
+export class ChildComponent implements OnChanges {
+  @Input() childAge: number;
+
+  ngOnChanges(changes: SimpleChanges) {
+    console.log(changes);
+  }
+}
+```
+
 ![alt text](images/ngOnChanges1.png "При первом вызове")
 
 ![alt text](images/ngOnChanges2.png "При изменении входного значения")
 
-- OnInit
+- `OnInit`
 
-Метод ngOnInit() вызывается только один раз. Используется для инициализации свойств компонента.
+Метод `ngOnInit()` вызывается только один раз. Используется для инициализации свойств компонента.
 [Пример использования был дан в ответе на вопрос 19.](#Любые-способы-передать-данные-между-двумя-компонентами,-даже-самые-нелепые)
 
-- DoCheck
+-  `DoCheck`
 
-Метод вызывается каждый раз при запуске механизма отслеживания изменений и один раз после ngOnInit().
-[Пример исаользования был дан при ответе на вопрос 15.](#Виды-pipe)
+Метод `ngDoCheck()`вызывается каждый раз при запуске механизма отслеживания изменений и один раз после `ngOnInit()`. Можно вызывать, если нужно что-то делать при каждом отслеживании изменения. А также, можно использовать вместе с `ChangeDetectorRef`, чтобы создавать локальные проверки изменений.
+[Пример использования был дан при ответе на вопрос 15.](#Виды-pipe)
 
-- AfterContentInit
+- `AfterContentInit`
 
-Метод вызывается один раз сразу после первого вызова ngDoCheck() и означает, что в шаблоне был инициализирован контент. [Пример использования дан в ответе на вопрос 4.](#Разница-между-ViewChild-и-ContentChild)
+Метод `ngAfterContentInit()`вызывается один раз сразу после первого вызова `ngDoCheck()` и означает, что в шаблоне был инициализирован контент. Использовать, если нужен доступ к свойствам дочернего компонента через `@ContentChild()` [Пример использования дан в ответе на вопрос 4.](#Разница-между-ViewChild-и-ContentChild)
 
-- AfterContentChecked
+- `AfterContentChecked`
 
-Вызов метода ngAfterContentChecked() происходит сразу после вызова ngAfterContentInit(). Далее метод вызывается при каждом запуске отслеживания изменений относительно *контента*.
+Вызов метода `ngAfterContentChecked()` происходит сразу после вызова `ngAfterContentInit()`. Далее метод вызывается при каждом запуске отслеживания изменений относительно *контента*. Можно использовать, чтобы назначить, например, стили в случае изменений относительно контента.
 
-- AfterViewInit
+- `AfterViewInit`
 
-Вызывается один раз после первого вызова ngAfterContentChecked() и означает инициализацию визуальной части компонента, включая его дочерние компоненты. Используется для получения значений переменых, обёрнутых @ViewChild()/@ViewChildren().
-[Пример использования дан в ответе на вопрос 4.](#Разница-между-ViewChild-и-ContentChild)   
-- AfterViewChecked
+`ngAfterViewInit()` вызывается один раз после первого вызова `ngAfterContentChecked()` и означает инициализацию визуальной части компонента, включая его дочерние компоненты. Используется для получения значений переменых, обёрнутых `@ViewChild()`/`@ViewChildren()`.
+[Пример использования дан в ответе на вопрос 4.](#Разница-между-ViewChild-и-ContentChild)
 
-Метод ngAfterViewChecked() вызывается сразу после ngAfterViewInit(). Далее - при каждом запуске отслеживания изменений относительно *визуальной части компонента*.
+- `AfterViewChecked`
 
-- OnDestroy
+Метод `ngAfterViewChecked()` вызывается сразу после `ngAfterViewInit()`. Далее - при каждом запуске отслеживания изменений относительно *визуальной части компонента*. Может вызываться. чтобы управлять тем, как отслеживание изменений влияет на представление.
 
-Метод ngOnDestroy() вызывается непосредственно перед удалением компонента из DOM. Используется для освобождения ресурсов.
+- `OnDestroy`
+
+Метод `ngOnDestroy()` вызывается непосредственно перед удалением компонента из DOM. Используется для освобождения ресурсов. Например, можно использовать, чтобы отменить подписку Observables, а также отсоединить обработчики событий.
 
 Ссылка: https://webdraftt.com/tutorial/component-lifecycle
 
@@ -1740,6 +1743,7 @@ export class ParentComponent {
 
 Пример структурной директивы (пояснения ниже):
 ```typescript
+//unless.directive.ts
 //директива-противоположность *ngIf
 import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
 
@@ -1775,10 +1779,10 @@ export class UnlessDirective {
 
 В примере структурной директивы:
 - `@Input set` позволяет получить извне значения (в данном случае `true`/`false`)
-- *TemplateRef* - объект, через который получаем доступ к шаблону директивы `<ng-template>`
-- *ViewContainerRef* - объект рендерера. Место, где контент будет отображён
-- метод clear() удаляет элемент (в нашем случае `<div>`)
-- метод createEmbeddedView() производит рендеринг шаблона  
+- `TemplateRef` - объект, через который получаем доступ к шаблону директивы `<ng-template>`
+- `ViewContainerRef` - объект рендерера. Место, где контент будет отображён
+- метод `clear()` удаляет элемент (в нашем случае `<div>`)
+- метод `createEmbeddedView()` производит рендеринг шаблона  
 
 Ссылка: https://metanit.com/web/angular2/3.6.php
 
@@ -1790,6 +1794,7 @@ export class UnlessDirective {
 Например, дочерний элемент:
 
 ```typescript
+//child.component.ts
 import { Component, Input } from '@angular/core';
 
 @Component({
@@ -1807,7 +1812,8 @@ export class ChildComponent {
 родительский элемент:
 
 ```typescript
-import {Component, ContentChild, ViewChild} from '@angular/core';
+//parent.component.ts
+import {Component, ContentChild, ViewChild, AfterContentInit, AfterViewInit} from '@angular/core';
 
 import { ChildComponent } from "../child/child.component";
 
@@ -1820,7 +1826,7 @@ import { ChildComponent } from "../child/child.component";
   `,
 })
 
-export class ParentComponent {
+export class ParentComponent implements AfterContentInit, AfterViewInit {
   title = "Hello, Child!";
 
   @ContentChild(ChildComponent) firstContentChild: ChildComponent;
@@ -1838,7 +1844,7 @@ export class ParentComponent {
 
 в app.component.html:
 
-```typescript
+```HTML
 <parent>
   <child [message]="title"></child>
 </parent>
@@ -1846,46 +1852,47 @@ export class ParentComponent {
 
 И результатом будет:
 
-- Hello, First View Child!
-- Hello, First Content Child!
-- Hello, Child!
+![alt text](images/FinalResult.png "Полученый результат").
+
+С помощью `@ViewChild` (и жизненного цикла `ngAfterViewInit()`) появляется доступ к свойству `message` первого дочернего элемента, ему присваивается значение `Hello, First View Child`. С помощью `@ContentChild` (и жизненного цикла `ngAfterContentInit()`) появляется доступ к свойству `message` дочернего компонента, который находится на месте `<ng-content></ng-content>`. Свойству присваивается значение `Hello, First Content Child!`. Третий дочерний компонент имеет значение `Hello, Child!` свойства `title`, потому что `@ViewChild` касается только первого дочернего элемента представления родителя.
 
 5. ### ngContent, ngContainer, ngTemplate
 
-- `<ng-template>` - это шаблонный элемент, который используется со структурными директивами.
-Элемент, к которому применяется структурная директива, оборачивается в `<ng-template>`.
-- `<ng-container>` - это группирующий элемент, который используется, чтобы избежать очень большой вложенности
-тегов при использовании структурных директив.
-- `ng-content` - это элемент, который позволяет родительским элементам внедрять html в дочерние элементы.
+- `<ng-template>` - это шаблонный элемент, который является реализацией стандартного *template*, предназначеный для вставки куска разметки. Обычно используется со структурными директивами. Элемент, к которому применяется структурная директива, оборачивается в `<ng-template>`.
+- `<ng-container>` - это группирующий элемент, который используется, чтобы избежать очень большой вложенности тегов при использовании структурных директив.
+- `<ng-content>` - это элемент, который позволяет вставлять разметку в шаблон компонента.
 
 Статья: https://www.freecodecamp.org/news/everything-you-need-to-know-about-ng-template-ng-content-ng-container-and-ngtemplateoutlet-4b7b51223691/
 
 6. ### hostListener и hostBinding
 
-`@HostListener` - это декоратор, который позволяет реагировать на DOM - событие, произошедшее на элементе, из директивы.
-`@HostBinding` - это декоратор, который позволяет устанавливать свойства элемента через директиву.
+`@HostListener` - это декоратор, который позволяет реагировать на DOM - событие, произошедшее на элементе, из атрибутивной директивы.
+`@HostBinding` - это декоратор, который позволяет устанавливать свойства элемента через атрибутивную директиву.
 
 Пример с `@HostListener`:
 
 ```typescript
+//change-color.directive.ts
 //директива, которая меняет цвет элемента при наведении мыши:
 import { Directive, ElementRef, Renderer2, HostListener } from '@angular/core';
 
 @Directive({
   selector: '[appChangeColor]',
 })
-
 export class ChangeColorDirective {
   constructor(private el: ElementRef, private renderer: Renderer2) {}
 
-   @HostListener("mouseover") onMouseOver() {
-       this.ChangeColor("red");
-   }
-   @HostListener("mouseleave") onMouseLeave() {
-     this.ChangeColor("black");
+   @HostListener("mouseover")
+   onMouseOver() {
+     this.changeColor("red");
    }
 
-   ChangeColor(color: string) {
+   @HostListener("mouseleave")
+   onMouseLeave() {
+     this.changeColor("black");
+   }
+
+   changeColor(color: string) {
      this.renderer.setStyle(this.el.nativeElement, 'color', color);
    }
 }
@@ -1904,15 +1911,16 @@ import { Directive, HostListener, HostBinding } from '@angular/core';
 @Directive({
   selector: '[appChangeColor]',
 })
-
 export class ChangeColorDirective {
   @HostBinding('style.color') color: string;
 
-  @HostListener("mouseover") onMouseOver() {
+  @HostListener("mouseover")
+  onMouseOver() {
        this.color = "red";
    }
 
-   @HostListener("mouseleave") onMouseLeave() {
+   @HostListener("mouseleave")
+   onMouseLeave() {
      this.color = "black";
    }
 }
@@ -1921,17 +1929,21 @@ export class ChangeColorDirective {
 
 7. ### change detection
 
-***ChangeDetection*** - механизм отслеживания изменений, который отвечает за своевременное отображение в шаблоне
-данных при их изменении. Обычно запускается при возникновении событий, выполнении HTTP-запросов или вызове `setTimeout()` и `setInterval()`.
+***Change Detection*** - механизм отслеживания изменений, который отвечает за своевременное отображение в шаблоне
+данных при их изменении. Обычно запускается при возникновении браузерных событий, выполнении HTTP-запросов или вызове `setTimeout()` и `setInterval()`. Механизм возможен благодаря `zone.js`, которая выполняет т.н "monkey patching" этих API (то есть дополняет их, либо модифицирует их каким-то своим образом). В Ангуляре автоматически создаётся зона `NgZone` (форк от корневой зоны Zone, подробнее об этом в ответе на вопрос о `Zone.js`), которая и следит за всеми асинхронными действиями, если они выполняюся в этой зоне. Стоит только отключить эту зону, как *change detection* станет невозможным.
 
 Работает по одной из двух стратегий:
 
-- Default (запуск при любом действии пользователя или изменения состоянии компонента)
-Default не всегда есть удобной, ибо если изменяется компонент, то затрагиваются и дочерние.
+- `Default` (запуск при любом действии пользователя или изменения состоянии компонента)
+
+`Default` не всегда есть удобной, ибо если изменяется компонент, то затрагиваются всё дерево компонентов.
+
+![alt text](images/ChangeDetection_default.gif "При стратегии default")
 
 Например:
 
 ```typescript
+//parent.component.ts
 import { Component } from '@angular/core';
 
 @Component({
@@ -1947,6 +1959,7 @@ export class ParentComponent {
 }
 ```
 ```typescript
+//child.component.html
 import { Component } from '@angular/core';
 
 @Component({
@@ -1968,9 +1981,10 @@ export class ChildComponent {
 
 Как видим, выявление изменения в родителе повлияло на дочерний элемент.
 
-- OnPush:
+- `OnPush` (запуск механизма отслеживания изменений в момент создания компонента, чему соответствует стадия жизненного цикла `OnChanges` и при некоторых других обстоятельствах, о которых ниже):
 
 ```typescript
+//child.component.ts
 //добавим в child changeDetection: ChangeDetectionStrategy.OnPush
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 
@@ -1990,22 +2004,74 @@ export class ChildComponent {
 
 ![alt text](images/OnPush.png "При нажатии клавиши при OnPush").
 
+Если к компоненту применена стратегия `OnPush`, то механизм отслеживания изменений запуститься только в момент создания компонента (стадия жизненного цикла `OnChanges`). Далее, компонент будет обновляться при следующих условиях:
+
+- поменялась **ссылка** на Input
+
+Здесь нужно помнить, что модификация свойств у объектов или элементов массивов *не создаёт новую ссылку*. И в этом случае механизм обнаружения изменений  со стратегией `OnPush`не будет работать. Чтобы он заработал, то нужно передавать через `@Input` новый объект или массив (потому что в таком случае ссылка изменяется).  
+
+- *Компонент или его потомки* запустили событие
+
+Под событиями здесь имеется в виду, например, клик на кнопку и т.д. А вот следующее *не* запустит механизм обнаружения изменений при стратегии `OnPush`:
+  - `setTimeout`, `setInterval`
+  - `Promise`
+  - `http.get().subscribe()`
+
+- обнаружение изменений было запущено вручную
+
+Имеется в виду метод `detectChanges()` сервиса `ChangeDetectorRef`. А также метод `markForCheck()` этого же сервиса.
+
 Вторая стратегия используется для повышения эффективности работы приложения (потому что снижается количество вызовов
 механизмов отслеживания изменений).
 
-Ссылка: https://webdraftt.com/tutorial/angular-change-detection
+Чтобы взять управление механизмом обнаружения изменений полностью под свой контроль, существует сервис `ChangeDetectorRef`. У него есть 5 методов:
+
+- `markForCheck()`
+
+Запускает механизм `ChangeDetection` для компонента. Если компонент использует стратегию обнаружения изменений `OnPush`, то этот метод запускает механизм обнаружения изменений даже когда он не должен был запускаться.  
+
+- `detach()`
+
+Полностью отключает механизм `ChangeDetection` для компонента. Метод называется *detach*, потому что "отделяет" компонент (его представление) от дерева отслеживания изменений (*change-detection tree*).
+
+- `detectChanges()`
+
+Принудительно запускает механизм `ChangeDetection`
+
+- `checkNoChanges()`
+
+Проверяет компонент и его потомоков и выбрасывает исключение, если любые изменения были замечены.
+
+- `reattach()`
+
+Повторно прикрепляет компонент (его представление) к дереву отслеживания изменений.
+
+Ссылки:
+
+- https://webdraftt.com/tutorial/angular-change-detection
+- https://xsltdev.ru/angular/tutorial/angular-change-detection/
+- https://indepth.dev/the-last-guide-for-angular-change-detection-youll-ever-need
 
 8. ### dependency injection
+
 ***Dependency Injection (DI)*** - это паттерн программирования, одна из реализаций принципа *Inversion of Control (IoC)*, то есть написания слабо связанного кода. Суть IoC в том, что каждый компонент должен быть как можно более изолированный от других и не должен полагаться в своей работе на детали реализации других компонентов.
 
 Без DI нужно было бы, например, самостоятельно создавать инстансы классов, от которых зависит другой класс. Однако, если бы, например, менялись параметры конструктора этих классов, то эти изменения повлекли бы переделывание кода класса, который зависит от этих других классов. Это делает код трудно поддерживаемым, не переиспользуемым и плохо тестируемым.
 
 При использовании DI, создание инстансов выносится за пределы зависимого класса. Зависимый класс при этом просто запрашивает нужные зависимости, понятия не имея, что нужно для их создания и т.д.
 
+Чаще всего DI Framework в Ангуляре применяется для инджекта сервисов. Для того, чтобы сделать возможным инджект сервиса, нужен декоратор `@Injectable`. У него есть только одно свойство: `providedIn`, которое может принимать 3 значения:
+
+- `root` (указывает на "регистрацию" этого сервиса в корневом *Injector*-e)
+- `platform` (на случай, если есть несколько приложений на странице, то `platform` указывает на общий для них всех *Injector*)
+- `any` (указывает, для каждого lazy loaded модуля будет свой уникальный инстанс, для всех остальных - один общий инстанс)
+
+Однако, `@Injectable` не достаточно. Ангуляр ничего про сервис пока не знает. Для этого нужно сервис зарегистрировать при помощи `Injector`. Один *корневой* `Injector` создаётся Ангуляром автоматически. Для регистрации сервиса нужно прописать `providedIn: root` в декораторе `@Injectable` (как в примере ниже).
+
 Пример DI в Angular:
 
 ```typescript
-//в logger.service.ts
+//logger.service.ts
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -2018,7 +2084,7 @@ export class LoggerService {
 }
 ```
 ```typescript
-//в app.component.ts
+//app.component.ts
 import { Component } from '@angular/core';
 import { LoggerService } from "./logger.service";
 
@@ -2033,18 +2099,82 @@ export class AppComponent {
   }
 }
 ```
+
+Если определить сервис в пределах компонента, то создаётся ещё один `Injector`, который в иерархии инджекторов находится ниже, чем корневой. К слову, когда класс запрашивает тот или иной сервис, то сначала проверяется его наличие "локально", то есть в локальном *injector-е*, и потом далее по иерархии. Процес останавливается, как только нужный сервис находится. Однако, может понадобиться, чтобы один и тот же сервис регистрировался и локальным *Injector-ом*, и глобальным. Чтобы "обойти" стандартный механизм поиска сервиса, нужно использовать `@SkipSelf()`. Пример:
+
+```typescript
+//deposits.component.ts
+@Component({
+  selector: 'deposits',
+  templateUrl: './deposits.component.html',
+  styleUrls: ['./deposits.component.scss'],
+})
+export class DepositsComponent {
+  constructor(
+    private localDepositsService: DepositsService,
+    @SkipSelf() private rootDepositsService: DepositsService
+  ) {}
+}
+```
+
+В случае, если необходимого сервиса нет ни в в одном *Injector-е*, то, чтобы не было сгенерировано исключение, используется декоратор `@Optional`. Тогда в переменую, которая должна была стать экземпляром, запишется `null`.
+
+Существует также `Injection token` - то есть некий уникальный идентификатор, который идентифицирует каждый провайдер среди всех остальных (о нему опрежедённый провайдер и запрашивается). Чаще всего `Injection token`-ом является сам класс провайдера, но если провайдится что-то, что не является классом (константы, например), то используется класс `InjectionToken`, экземпляры которого являются Injection-токенами.  
+
+Чтобы заинжектить функцию или класс,у которых нет декоратора `@Injectable`, можно также воспользоваться `@Inject`:
+
+```typescript
+//testClass.module.ts
+export class TestClass {
+  public number = 5;
+}
+```
+
+```typescript
+//parent.component.ts
+import { Component, Inject } from '@angular/core';
+import { TestClass } from "../testClass.module";
+
+@Component({
+  selector: 'app-parent',
+  template: `
+    <p>{{number}}</p>
+    `,
+})
+export class ParentComponent {
+  number: number;
+
+  constructor(@Inject(TestClass) private externalClass) {
+    this.number = this.externalClass.number;
+  }
+}
+```
+```typescript
+//app.module.ts (extract)
+@NgModule({
+  providers: [TestClass]
+})
+```
+
+Также, если имеются модули, которые подгружаюся лениво, то Ангуляр создаёт *Injector*, который наследуется от родительского *Injector*-а. Но это не означает, что новый *Injector* создаст инстанс каждого сервиса, который провайдится в родительском *Injector*-е. Но если сервис провайдился в лениво подгружаемом модуле, то тогда да, создастся новый инстанс.
+
+Ссылки:
+
+- https://xsltdev.ru/angular/tutorial/dependency-injection/
+- https://stackoverflow.com/questions/52638901/is-lazy-loading-creating-new-injector-in-angular
+
 9. ### Как заинжектить переменную
 
 ```typescript
-//в app.module.ts
+//app.module.ts
 @NgModule({
   providers: [
-      {provide: 'someVariable', useValue: 500 }
-    ],
+    {provide: 'someVariable', useValue: 500 },
+  ],
 })
 ```
 ```typescript
-//и потом в каком-то компоненте
+//app.component.ts
 import { Component, OnInit, Inject } from '@angular/core';
 
 @Component({...})
@@ -2061,19 +2191,20 @@ export class AppComponent implements OnInit {
 
 10. ### Разница между объявлениями сервиса в компоненте или модуле
 
-Объявление сервиса в компоненте означает, что сервис очень тесно связан именно с этим компонентом
-и не будет использоваться где-либо ещё в приложении.
-Объявление же сервиса в модуле означает, что во всем приложении будет один инстанс сервиса, и он может быть использован где-угодно.
+Разница между объявлениями сервиса в компоненте или модуле в том, что если объявить сервис в списке `@NgModule.providers` в Eager и Lazy модулях, то сервис будет дублироваться. Если же прописать `providedIn: root`, то сервис будет добавлен в корневой модуль, и дублироваться в случае использования ленивым модулем не будет.
 
-Ссылка: https://www.pluralsight.com/guides/registering-a-service-with-an-angular-module-or-component
+https://dev-gang.ru/article/kak-izbezhat-dublirovanija-ekzempljarov-servisov-v-angular-lexpjkp2gw/
 
 11. ### Виды форм
 
-Формы в Angular бывают двух видов: **reactive** и **template-driven**.
+Формы в Angular бывают двух видов: **reactive** и **template-driven**. Первый подход к написанию форм подразумевает, что описание формы происходит в модели компонента в виде дерева объектов, после этого дерево связывается с шаблоном; также, все манипуляции с формой происходят тоже в модели. Второй подход подразумевает, что ключевую роль играет именно шаблон компонента, то есть всё описание производится в нём. Первый подход рекомендуют использовать, если форма/формы составляют значтельную часть приложения, либо являются достаточно объемными. Второй подход подходит для простых форм.
 
-Пример reactive:
+Чтобы создать реактивную форму, нужно использовать `FormControl` (если есть одиночный контрол формы, один инпут, например), `FormGroup` (если есть группа контролов формы), `FormArray` (если массив контролов формы).
+
+Пример простой reactive формы:
 
 ```typescript
+//favourite-color.component.ts
 import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
@@ -2085,12 +2216,68 @@ import { FormControl } from '@angular/forms';
 })
 
 export class FavouriteColorComponent {
-  favouriteColorControl = new FormControl('');
+  favouriteColorControl = new FormControl('');//одиночный контрол
 }
 ```
+
+В примере выше, при каждом изменении `favouriteColorControl` будет создаваться новый инстанс `FormControl`. В *template-driven* форме значение бы просто изменялось.
+
+Пример reactive формы по-сложнее:
+
+```typescript
+//favourites.component.ts
+import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+
+@Component({
+  selector: 'app-favourites',
+  template: `
+  <form [formGroup]="favouritesForm">
+    <label for="favouriteBook">Favourite book</label>
+    <input type="text" id="favouriteBook" formControlName="favouriteBook" />
+    <br/><br/>
+
+    <label for="favouriteBand">Favourite band</label>
+    <input type="text" id="favouriteBand" formControlName="favouriteBand" />
+    <br/><br/>
+
+    <button type="submit">Send</button>
+  </form>
+
+  <div>
+    {{favouritesForm.favouriteBand}}
+  </div>
+  `,
+  styleUrls: ['./favourites.component.css']
+})
+export class FavouritesComponent implements OnInit {
+  favouritesForm: FormGroup;
+
+  constructor(private fb: FormBuilder) {}
+
+  ngOnInit(): void {
+    this.initForm();
+  }
+
+  initForm() {
+    this.favouritesForm = this.fb.group({
+      favouriteBook: ["", [Validators.required]],
+      favouriteBand: ["", [Validators.required]],
+      favouriteMovie: [null],
+    });
+  }
+}
+```
+
+`fomGroup` и `formControlName` - директивы, с помощью которых связываются форма и шаблон компонента.
+Для валидации можно используюся методы класса `Validators` (к примеру, `Validators.required`). Также, на все контролы Angular динамически добавляет парные CSS-классы (например, `ng-invalid/ng-valid`), которые можно использовать для стилизации.
+
+Чтобы получить доступ, например, к первому контролу в компоненте, нужно `this.favouritesForm.controls[favouriteBook]`
+
 Пример template-driven:
 
 ```typescript
+//favourite-color.component.ts
 import { Component } from "@angular/core"
 
 @Component({
@@ -2117,11 +2304,12 @@ export class FavouriteColorComponent {
 Чтобы создать дочерний маршрут нужно:
 - В шаблоне компонента, для которого создаются дочерние маршруты нужно добавить компонент `<router-outlet>`, где будут
 отображаться компоненты.
-- В *AppRoutingModule* в массиве routes в объекте, где указан путь к нужному клмпоненту, добавить поле children, которое также является масивом объектов, в каждом из которых также есть поля `path` и `component`.
+- В *AppRoutingModule* в массиве `routes` в объекте, где указан путь к нужному компоненту, добавить поле children, которое также является масивом объектов, в каждом из которых также есть поля `path` и `component`.
 
 Пример:
 
 ```typescript
+//child.component.ts
 import { Component } from '@angular/core';
 
 @Component({
@@ -2131,6 +2319,7 @@ import { Component } from '@angular/core';
 export class ChildComponent {}
 ```
 ```typescript
+//parent.component.ts
 import { Component } from '@angular/core';
 
 @Component({
@@ -2152,16 +2341,27 @@ export class ParentComponent {}
 И в app-routing.module.ts:
 
 ```typescript
+//app-routing.module.ts (extract)
 const routes: Routes = [
   {
     path: "parent",
     component: ParentComponent,
-    children: [{
-    path: "child", component: ChildComponent
-  }]
-}
+    children: [
+      {
+        path: "child", component: ChildComponent
+      }
+    ]
+  }
 ];
 ```
+
+![alt text](images/FirstLoading.png "На главной странице")
+
+![alt text](images/ToTheParent.png "Переходим через путь на компонент")
+
+![alt text](images/ToTheChild.png "Переходим через дочерний путь предыдущего пути")
+
+Дочерние маршруты используются при такой ситуации: если компонент, который сам является маршрутом, сам должен принимать в качестве внутреннего содержимого какой-то другой компонент в зависимости от запроса.
 
 Ссылка: https://angular.io/guide/router#nesting-routes
 
@@ -2169,15 +2369,19 @@ const routes: Routes = [
 
 ***Guards*** бывают следующими:
 
-- CanActivate (разрешает/запрещает доступ к маршруту)
-- CanActiveChild (разрешает/запрещает доступ к дочернему маршруту)
-- CanDeactivate (разрешает/запрещает уход с текущего маршрута)
-- Resolve (выполняет какое-либо днйствие перед переходом на маршрут, обычно - ожидание данных с сервера)
-- CanLoad (разрешает/запрещает загрузку модуля, загружаемого асинхронно)
+- `CanActivate` (разрешает/запрещает доступ к маршруту)
+- `CanActiveChild` (разрешает/запрещает доступ к дочернему маршруту)
+- `CanDeactivate` (разрешает/запрещает уход с текущего маршрута)
+- `Resolve` (выполняет какое-либо действие перед переходом на маршрут, обычно - ожидание данных с сервера)
+- `CanLoad` (разрешает/запрещает загрузку модуля, загружаемого асинхронно)
+
+Все guards должны возвращать `true` или `false`. Если это происходит в синхронном режиме, то то возвращается тип `Boolean`. Если происходит в асинхронном режиме, то возвращается тип `Observable<boolean>` или `Promise<boolean>`.
+Если возвращается `false`, то инициируется событие маршрутизации `NavigationCancel`.
 
 Пример использования простого guard:
 
 ```typescript
+//admin-guard.guard.ts
 //Guard, который пускает/не пускает на маршрут:
 import { Injectable } from '@angular/core';
 import { CanActivate } from '@angular/router';
@@ -2187,7 +2391,7 @@ import { CanActivate } from '@angular/router';
 })
 export class AdminGuardGuard implements CanActivate {
   canActivate(): boolean {
-      //Authentication and Authorization Code here
+    //Authentication and Authorization Code here
     return false;
   }
 }
@@ -2196,6 +2400,7 @@ export class AdminGuardGuard implements CanActivate {
 В *app-routing.module.ts* прописываем следующее:
 
 ```typescript
+//app-routing.module.ts
 //при добавлени /admin, должно показывать AdminHomeComponent:
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
@@ -2217,21 +2422,22 @@ export class AppRoutingModule { }
 <h2>Main Page</h2>
 <router-outlet></router-outlet>
 ```
-Поскольку guard возвращает false, то при попытке доступа к AdminHomeComponent через /admin, будет видно только **Main Page**.
+Поскольку guard возвращает `false`, то при попытке доступа к AdminHomeComponent через */admin*, будет видно только **Main Page**.
 
-Если же поменять возращаемое значение guard на true, то попытка получения доступа к AdminHomeComponent будет удачной.
+Если же поменять возращаемое значение guard на `true`, то попытка получения доступа к AdminHomeComponent будет удачной.
 
 Ссылка: https://www.youtube.com/watch?v=VRf21fum3nk
 
 15. ### Виды pipe
 
-***Pipes*** бывают двух видов: pure (чистые) и impure (грязные, нечистые).
+***Pipes*** бывают двух видов: *pure (чистые)* и *impure (грязные, нечистые)*.
 
 Разница между чистыми и нечистыми pipes в том, что первые отслеживают изменения в непримитивах только тогда, когда меняется сама ссылка, а не значение по ссылке; вторые же отслеживают все изменения.
 
 Например:
 
 ```typescript
+//format-array.pipe.ts
 //создаём pipe, которая превращает массив в строку
 import { Pipe, PipeTransform } from '@angular/core';
 
@@ -2245,7 +2451,8 @@ export class FormatArrayPipe implements PipeTransform {
 }
 ```  
 ```typescript
-import { Component } from '@angular/core';
+//child.component.ts
+import { Component, DoCheck } from '@angular/core';
 
 @Component({
   selector: 'child',
@@ -2256,7 +2463,7 @@ import { Component } from '@angular/core';
   `,
 })
 
-export class ChildComponent {
+export class ChildComponent implements DoCheck {
   users = ["Alice", "Bob", "Clara"];
 
   ngDoCheck() {
@@ -2277,17 +2484,109 @@ pipe сделать нечистой:
   pure: false,//добавить эту строчку
 })
 ```
-И тогда всё будет работаь как надо:
+И тогда всё будет работать как надо:
 
 ![alt text](images/ImpurePipe.png "При использовании Impure pipe")
+
+Стоит добавить, что в Angular есть свои встроеные pipes: `DatePipe`, `UpperCasePiPe`, `LowerCasePipe`, `CurrencyPipe`, `DecimalPipe`, `PercentPipe` (названия pipes вполне понятно говорят о их назначнении)
 
 Ссылка: https://metanit.com/web/angular2/8.3.php
 
 16. ### Для чего используется zone.js
 
-Zone.js используется, чтобы сделать возможным change detection. Можно отключить. Для этого нужно в файле **main.ts** сделать следующее:
+*Zone.js* используется, чтобы "следить" за выпонением асинхронных операций (setTimeout, Promises и т.д). Сама "зона" - это механизм для перехватывания и "слежки" за асинхронными операциями. Для каждой такой операции Zone.js создает таск, таск выполняется в одной "зоне". В zone.js есть одна "главная" зона ('root' zone). Новые зоны создаются при помощи метода `fork()` от главной зоны.
+
+В Ангуляре каждый таск выполняется в "зоне Ангуляра" или `ngZone` (эта зона также является форком корневой, "главной зоны"). К слову, предназначение *Zone.js* именно в Ангуляре - это делать возможным change detection. Change detection запускается только вследствие выполнения тех асинхронных операций, которые выполняются в пределах зоны `ngZone`. Бывает такое, что обязательное *change detection* лишнее и ненужное после выполнения какой-то асинхронной операции. Тогда имеет смысл запустить эту асинхронную операцию вне `ngZone`. И тогда не будет вызываться отслеживание изменений. Это делается при помощи `runOutsideAngular` следующим образом:
 
 ```typescript
+//child.component.ts
+import { Component, OnInit } from '@angular/core';
+import { NgZone } from "@angular/core";
+
+@Component({
+  selector: 'app-child',
+  template: `<p>{{number}}</p>`,
+})
+export class ChildComponent implements OnInit {
+  number = 0;
+  constructor(private zone: NgZone) {}
+
+  ngOnInit(): void {
+    let counter = 0;
+    this.zone.runOutsideAngular(() => {
+      setInterval(() => {
+        counter++;
+        if (counter > 10) { //как только пройдёт 10 секунд
+          this.zone.run(() => {//мы "вернёмся" в зону ngZone
+            ++this.number;//и изменения будут отслеживаться
+          })
+        } else {//а пока 10 секунд не прошло
+          ++this.number;//эти изменения мы не увидим
+        }
+      }, 1000)
+    })
+  }
+}
+```
+
+Мы будем видеть в браузере 10 секунд 0, а потом сразу 11, потому что предыдущие увеличения изначального числа происходили вне зоны `ngZone` и поэтому не отслеживались.
+
+Также, можно создать свою зону:
+
+```typescript
+//my_zone.ts
+import 'zone.js';
+import { Injectable } from "@angular/core";
+
+declare let Zone: any;
+
+@Injectable({
+  providedIn: 'root'
+})
+export class MyZone {
+  myZone;
+  constructor() {
+    const parentZone = new Zone();
+    this.myZone = parentZone.fork({
+      name: "my Zone",
+    })
+  }
+}
+```
+
+И запускать увеличение числа из предыдущего примера уже в новосозданной зоне, а потом вернуться в `ngZone`:
+
+```typescript
+//child.component.ts
+//отдельно класс из предыдущего примера, но также нужно заимпортить MyZone
+export class ChildComponent implements OnInit {
+  number = 0;
+  constructor(private zone: NgZone, private anotherZone: MyZone) {}
+
+  ngOnInit(): void {
+    let counter = 0;
+    this.anotherZone.myZone.run(() => {//запускаем таймер в новосозданной зоне
+      setInterval(() => {
+        counter++;
+        if (counter > 10) {//а когда counter будет 11
+          this.zone.run(() => {//то возвратимся в ngZone, чтобы отслеживать изменения
+            ++this.number;
+          })
+        } else {
+          console.log(++this.number)//чтобы убедиться, что всё работает
+        }
+      }, 1000)
+    })
+  }
+}
+```
+
+Как видим, отслеживание изменений опять-таки запускалось только в пределах `ngZone`.
+
+К слову, `ngZone` можно вообще отключить. Для этого нужно в файле **main.ts** сделать следующее:
+
+```typescript
+//main.ts
 platformBrowserDynamic().bootstrapModule(AppModule, {ngZone: "noop"})
   .catch(err => console.error(err));
 ```
@@ -2296,6 +2595,7 @@ platformBrowserDynamic().bootstrapModule(AppModule, {ngZone: "noop"})
 17. ### Tasks в zone.js
 
 В zone.js существуют следующие виды тасков:
+
 - Microtask
 
 Выполняется сразу после какой-то текущей задачи. Нельзя отменить, поэтому точно сработает один раз. Сюда относятся Promisee.then, process.nextTick и др.
@@ -2306,17 +2606,27 @@ platformBrowserDynamic().bootstrapModule(AppModule, {ngZone: "noop"})
 
 - EventTask
 
-"Слушает" какое-то будущее событие. Какая задержка будет перед выполнением - непонятно, может не произойи ни разу, а может
+"Слушает" какое-то будущее событие. Какая задержка будет перед выполнением - непонятно, может не произойти ни разу, а может
 много раз. Например, EventTarget's EventListener, EventEmitter's EventListener.
+
+Для "слежки" за выполнением этих тасков в каждой зоне существуют т.н. *interception hooks*: `onIntercept`, `onInvoke`, `onHandleError`, `onScheduleTask`, `onInvokeTask`, `onCancelTask`, `onHasTask`
 
 https://github.com/angular/zone.js/blob/master/dist/zone.js.d.ts
 
 18. ### Как протестировать асинхронный код
 
-При помощи `fakeAsync`, а также `flush`, `tick`, `flushMicrotasks`.
+При помощи `fakeAsync`, а также `flush`, `tick`, `flushMicrotasks`:
+
+- `fakeAsync` оборачивает функцию и выполняет её в зоне fakeAsync.
+- `tick(milliseconds)` - имитирует время в зоне fakeAsync; выполняет все таски, которые должны выполниться за указанное время в миллисекундах или раньше.
+- `flush()` - выполняет все макротаски в очереди.
+- `flushMicrotasks()` - выполняет все микротаски в очереди.
+
+Пример с макротаском:
 
 Например, есть такой асинхронный код в сервисе:
 ```typescript
+//sum.service.ts
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -2336,7 +2646,7 @@ export class SumService {
 Для его тестирования нужно написать следующий тест (при условии наличия автоматически сгенерированной заготовки):
 
 ```typescript
-//sum.services.ts
+//sum.services.spec.ts
 it('should return sum async', fakeAsync(() => {
   service.sumAsync(4, 5).then(result => {
   expect(result).toBe(9);
@@ -2349,6 +2659,7 @@ flush();
 либо же:
 
 ```typescript
+//sum.services.spec.ts
 it('should return sum async', fakeAsync(() => {
   service.sumAsync(4, 5).then(result => {
   expect(result).toBe(9);
@@ -2359,12 +2670,46 @@ tick(2000);
 ```
 `flushMicrotasks` в данном случае не сработает, потому что setTimeout относится к макротаскам, а не микротаскам.
 
+Пример с микротаском:
+
+Есть следующий асинхронный код в сервисе:
+
+```typescript
+//service.service.ts
+import { Injectable,  } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ServiceService {
+  test = 4;
+
+  asyncMethod(): void {
+    Promise.resolve(6).then((result) => {this.test = result});
+  }
+}
+```
+
+Для его тестироваия нужно написать следующий тест:
+
+```typescript
+//service.service.spec.ts
+it('should return 6', fakeAsync(() => {
+  service.asyncMethod();
+
+  flushMicrotasks();
+
+  expect(service.test).toBe(6);
+}));
+```
+
 Ссылка: https://www.youtube.com/watch?v=4evLVxAt1xU
 
 19. ### Любые способы передать данные между двумя компонентами, даже самые нелепые
 - при помощи `@Input`:
 
 ```typescript
+//child.component.ts
 //компонент, КУДА данные передаются
 import { Component, Input } from '@angular/core';
 
@@ -2377,6 +2722,7 @@ export class ChildComponent {
 }
 ```
 ```typescript
+//parent.component.ts
 //компонент, ОТКУДА данные передаются
 import { Component } from '@angular/core';
 
@@ -2391,6 +2737,7 @@ export class ParentComponent {
 - При помощи @Output и EventEmitter:
 
 ```typescript
+//chils.component.ts
 //компонент, ОТКУДА данные передаются
 import { Component, Output, EventEmitter} from '@angular/core';
 
@@ -2403,6 +2750,7 @@ export class ChildComponent {
 }
 ```
 ```typescript
+//parent.component.ts
 //компонент, КУДА данные передаются
 import { Component } from '@angular/core';
 
@@ -2423,6 +2771,7 @@ export class ParentComponent {
 - При помощи сервиса:
 
 ```typescript
+//service.service.ts
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -2433,6 +2782,7 @@ export class ServiceService {
 }
 ```
 ```typescript
+//parent.component.ts
 import { Component, OnInit } from '@angular/core';
 import { ServiceService } from '../service.service';
 
@@ -2455,6 +2805,7 @@ export class ParentComponent implements OnInit{
 }
 ```
 ```typescript
+//child.comonent.ts
 import { Component, OnInit } from '@angular/core';
 import { ServiceService } from "../service.service";
 
@@ -2475,7 +2826,10 @@ export class ChildComponent implements OnInit {
 
 20. ### Разница между AOT и JIT
 
-При ***AOT (Ahead of Time Compilation)*** компиляция происходит во время сборки (build time).  
+- При ***AOT (Ahead of Time Compilation)*** компиляция происходит во время сборки (build time). При ***JIT (Just in Time Compilation)*** компиляция происходит во время выполнения (run time).
+- При AOT более быстрый рендеринг, так как всё уже скомпилировао, нужно только выполнить. При JIT рендеринг дольше.
+- При AOT меньший размер загружаемого в браузер, ведь сам компилятор уже не нужет браузеру (а он, к слову, очень тяжеловесный). При JIT браузеру нужен и сам компилятор.
+- При AOT нужно меньше асинхронных запросов для получения исходных HTML- И CSS-файлов.
+- AOT лучше в целях безопасности. Исключены HTML-Injections.
 
-При ***JIT (Just in Time Compilation)*** компиляция происходит во время выполнения (run time).
 https://www.youtube.com/watch?v=EhnD7qHDerc
